@@ -1,0 +1,111 @@
+Script started on Sun 04 Nov 2018 10:32:18 PM UTC
+kroot@otuslinux:~\[root@otuslinux ~]# lsblk
+NAME                        MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+sda                           8:0    0   40G  0 disk 
+├─sda1                        8:1    0    1M  0 part 
+├─sda2                        8:2    0    1G  0 part /boot
+└─sda3                        8:3    0   39G  0 part 
+  ├─VolGroup00-LogVol00     253:0    0    8G  0 lvm  /
+  └─VolGroup00-LogVol01     253:1    0  1.5G  0 lvm  [SWAP]
+sdb                           8:16   0   10G  0 disk 
+└─grace-lassy               253:7    0   10G  0 lvm  
+sdc                           8:32   0    2G  0 disk 
+├─mirror-mirror_lv_rmeta_0  253:2    0    4M  0 lvm  
+│ └─mirror-mirror_lv        253:6    0  952M  0 lvm  /var
+└─mirror-mirror_lv_rimage_0 253:3    0  952M  0 lvm  
+  └─mirror-mirror_lv        253:6    0  952M  0 lvm  /var
+sdd                           8:48   0    1G  0 disk 
+├─mirror-mirror_lv_rmeta_1  253:4    0    4M  0 lvm  
+│ └─mirror-mirror_lv        253:6    0  952M  0 lvm  /var
+└─mirror-mirror_lv_rimage_1 253:5    0  952M  0 lvm  
+  └─mirror-mirror_lv        253:6    0  952M  0 lvm  /var
+sde                           8:64   0    1G  0 disk 
+sdf                           8:80   0  256M  0 disk 
+sdg                           8:96   0  256M  0 disk 
+kroot@otuslinux:~\[root@otuslinux ~]#  lvremove /dev/vg_root/lv_root[K[K[K[K[K[K[K[K[K[K[K[K[K[K[Kgrace/lassy 
+Do you really want to remove active logical volume grace/lassy? [y/n]: y
+  Logical volume "lassy" successfully removed
+kroot@otuslinux:~\[root@otuslinux ~]# lvremove /e[K[Kde[K[K/dev/gra[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[Kvgremove /dev/grace
+  Volume group "grace" successfully removed
+kroot@otuslinux:~\[root@otuslinux ~]# pvremove /dev/sdb
+  Labels on physical volume "/dev/sdb" successfully wiped.
+kroot@otuslinux:~\[root@otuslinux ~]# lvcreate -L2G /dee[Kb[K[K[K[KVolGRou[K[K[Kroup00 -n sweet-home[K[K[K[K[K
+  Logical volume "sweet" created.
+kroot@otuslinux:~\[root@otuslinux ~]# mkfs.xfs //d[K[Kdev/VolGroup00/sweet 
+meta-data=/dev/VolGroup00/sweet  isize=512    agcount=4, agsize=131072 blks
+         =                       sectsz=512   attr=2, projid32bit=1
+         =                       crc=1        finobt=0, sparse=0
+data     =                       bsize=4096   blocks=524288, imaxpct=25
+         =                       sunit=0      swidth=0 blks
+naming   =version 2              bsize=4096   ascii-ci=0 ftype=1
+log      =internal log           bsize=4096   blocks=2560, version=2
+         =                       sectsz=512   sunit=0 blks, lazy-count=1
+realtime =none                   extsz=4096   blocks=0, rtextents=0
+kroot@otuslinux:~\[root@otuslinux ~]# mount /dev/VolGroup00/sweet /mnt
+kroot@otuslinux:~\[root@otuslinux ~]# cp -aR //[Khome/* /mnt/
+kroot@otuslinux:~\[root@otuslinux ~]# rm -rf hom[K[K[K/home/*
+kroot@otuslinux:~\[root@otuslinux ~]# mount /dev/VolGroup00/sweet /home/
+kroot@otuslinux:~\[root@otuslinux ~]# blkid | grep Home
+kroot@otuslinux:~\[root@otuslinux ~]# echo "/dev/VolGroup00/sweet" [K[K /home [C[C[C[C[C[C[C[C[C[C[C[C[Cxfs deau[K[Kfaults 0 0'[1P[1@'[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C >> er[Kt[K[K/etc/fstab 
+kroot@otuslinux:~\[root@otuslinux ~]# tail -2 [K /etc/fstab 
+/dev/mapper/mirror-mirror_lv /var ext4 defaults 0 0
+/dev/VolGroup00/sweet /home xfs defaults 0 0
+kroot@otuslinux:~\[root@otuslinux ~]# > home[K[K[K[K/o[Khome/file{1..20}
+bash: /home/file{1..20}: ambiguous redirect
+kroot@otuslinux:~\[root@otuslinux ~]# > /home/file{1..20}[C[1P /home/file{1..20}t /home/file{1..20}o /home/file{1..20}u /home/file{1..20}c /home/file{1..20}h /home/file{1..20}
+kroot@otuslinux:~\[root@otuslinux ~]# lvc[Kcreate -l[KL100MB -s -n sweet-snap /dev/V[1P[1@_[C[C[C[C[C[C[C[C[C[C[C[K[K[K[K[K[K/de[K[K[Ksweet[1P[1@-[C[C[C[C[C[C[C[C[C[Cdsweetesweetvsweet[1Psweet[1Psweet[1Psweet/sweetdsweetesweetvsweet/sweetVsweet[1PsweetVsweetosweetlsweetGsweetrsweetosweetusweetpsweet0sweet0sweet/sweet
+  Rounding up size to full physical extent 128.00 MiB
+  Logical volume "sweet-snap" created.
+kroot@otuslinux:~\[root@otuslinux ~]# rm -f /home/file{11.2[K.20}
+kroot@otuslinux:~\[root@otuslinux ~]# umount /home/
+kroot@otuslinux:~\[root@otuslinux ~]# lvconvert --merge /dev/VolGroup00/sweet-snap 
+  Delaying merge since origin is open.
+  Merging of snapshot VolGroup00/sweet-snap will occur on next activation of VolGroup00/sweet.
+kroot@otuslinux:~\[root@otuslinux ~]# mount /home/
+kroot@otuslinux:~\[root@otuslinux ~]# ls /home/file[K[K[K[K
+file1  file10  file2  file3  file4  file5  file6  file7  file8  file9  [0m[01;34mvagrant[0m
+kroot@otuslinux:~\[root@otuslinux ~]# v[Klv
+lvchange     lvdisplay    lvmconf      lvmdump      lvmsadc      lvremove     lvs          
+lvconvert    lvextend     lvmconfig    lvmetad      lvmsar       lvrename     lvscan       
+lvcreate     lvm          lvmdiskscan  lvmpolld     lvreduce     lvresize     
+[root@otuslinux ~]# lvchange --a[K[Kan[K[K[K[Kumount /home/
+kroot@otuslinux:~\[root@otuslinux ~]# lv [Kchange /dev/
+/dev/mirror/mirror_lv     /dev/VolGroup00/LogVol00  /dev/VolGroup00/LogVol01  /dev/VolGroup00/sweet
+[root@otuslinux ~]# lvchange /dev/[K[Klvchange -an /home[K[K[K[Kdev/VolGroup00/sweet 
+  Logical volume VolGroup00/sweet contains a filesystem in use.
+kroot@otuslinux:~\[root@otuslinux ~]# umount /home/
+umount: /home/: not mounted
+kroot@otuslinux:~\[root@otuslinux ~]# umount /home/lvchange -an /dev/VolGroup00/sweet 
+  Logical volume VolGroup00/sweet contains a filesystem in use.
+kroot@otuslinux:~\[root@otuslinux ~]# ls /home/
+kroot@otuslinux:~\[root@otuslinux ~]# lsblk
+NAME                           MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+sda                              8:0    0   40G  0 disk 
+├─sda1                           8:1    0    1M  0 part 
+├─sda2                           8:2    0    1G  0 part /boot
+└─sda3                           8:3    0   39G  0 part 
+  ├─VolGroup00-LogVol00        253:0    0    8G  0 lvm  /
+  ├─VolGroup00-LogVol01        253:1    0  1.5G  0 lvm  [SWAP]
+  ├─VolGroup00-sweet-real      253:8    0    2G  0 lvm  
+  │ ├─VolGroup00-sweet         253:7    0    2G  0 lvm  /mnt
+  │ └─VolGroup00-sweet--snap   253:10   0    2G  0 lvm  
+  └─VolGroup00-sweet--snap-cow 253:9    0  128M  0 lvm  
+    └─VolGroup00-sweet--snap   253:10   0    2G  0 lvm  
+sdb                              8:16   0   10G  0 disk 
+sdc                              8:32   0    2G  0 disk 
+├─mirror-mirror_lv_rmeta_0     253:2    0    4M  0 lvm  
+│ └─mirror-mirror_lv           253:6    0  952M  0 lvm  /var
+└─mirror-mirror_lv_rimage_0    253:3    0  952M  0 lvm  
+  └─mirror-mirror_lv           253:6    0  952M  0 lvm  /var
+sdd                              8:48   0    1G  0 disk 
+├─mirror-mirror_lv_rmeta_1     253:4    0    4M  0 lvm  
+│ └─mirror-mirror_lv           253:6    0  952M  0 lvm  /var
+└─mirror-mirror_lv_rimage_1    253:5    0  952M  0 lvm  
+  └─mirror-mirror_lv           253:6    0  952M  0 lvm  /var
+sde                              8:64   0    1G  0 disk 
+sdf                              8:80   0  256M  0 disk 
+sdg                              8:96   0  256M  0 disk 
+kroot@otuslinux:~\[root@otuslinux ~]# umount /mnt/
+kroot@otuslinux:~\[root@otuslinux ~]# lvchange -an /dev/VolGroup00/sweet
+kroot@otuslinux:~\[root@otuslinux ~]# lvcgange -ay /dev/VolGroup00/sweet
+kroot@otuslinux:~\[root@otuslinux ~]# mount /home/
