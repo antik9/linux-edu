@@ -1,0 +1,32 @@
+Script started on Mon 05 Nov 2018 08:34:34 PM UTC
+kvagrant@otuslinux04boot:~\[vagrant@otuslinux04boot ~]$ lsblk
+NAME                        MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+sda                           8:0    0   40G  0 disk 
+├─sda1                        8:1    0    1M  0 part 
+├─sda2                        8:2    0    1G  0 part /boot
+└─sda3                        8:3    0   39G  0 part 
+  ├─grace-LogVol00          253:0    0 37.5G  0 lvm  /
+  └─grace-LogVol01          253:1    0  1.5G  0 lvm  [SWAP]
+sdb                           8:16   0   10G  0 disk 
+sdc                           8:32   0    2G  0 disk 
+├─mirror-mirror_lv_rmeta_0  253:2    0    4M  0 lvm  
+│ └─mirror-mirror_lv        253:6    0  952M  0 lvm  
+└─mirror-mirror_lv_rimage_0 253:3    0  952M  0 lvm  
+  └─mirror-mirror_lv        253:6    0  952M  0 lvm  
+sdd                           8:48   0    1G  0 disk 
+├─mirror-mirror_lv_rmeta_1  253:4    0    4M  0 lvm  
+│ └─mirror-mirror_lv        253:6    0  952M  0 lvm  
+└─mirror-mirror_lv_rimage_1 253:5    0  952M  0 lvm  
+  └─mirror-mirror_lv        253:6    0  952M  0 lvm  
+sde                           8:64   0    1G  0 disk 
+├─sde1                        8:65   0 1014M  0 part 
+└─sde9                        8:73   0    8M  0 part 
+sdf                           8:80   0  256M  0 disk 
+├─sdf1                        8:81   0  246M  0 part 
+└─sdf9                        8:89   0    8M  0 part 
+sdg                           8:96   0  256M  0 disk 
+├─sdg1                        8:97   0  246M  0 part 
+└─sdg9                        8:105  0    8M  0 part 
+kvagrant@otuslinux04boot:~\[vagrant@otuslinux04boot ~]$ exit
+
+Script done on Mon 05 Nov 2018 08:34:57 PM UTC

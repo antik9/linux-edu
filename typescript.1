@@ -1,0 +1,36 @@
+Script started on Mon 05 Nov 2018 08:17:31 PM UTC
+kroot@otuslinux04boot:~\[root@otuslinux04boot ~]# [H[J[root@otuslinux04boot ~]# vgrean[K[Kname VolGrpu[K[Koup00 ga[Krace
+  Volume group "VolGroup00" successfully renamed to "grace"
+kroot@otuslinux04boot:~\[root@otuslinux04boot ~]# sed 's/VolGroup00/t[Kgrace'[K/g' /boot/grub2/grub.cfg [C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[1@ [1@-[1@i
+kroot@otuslinux04boot:~\[root@otuslinux04boot ~]# grep grace /boot/grub2/grub.cfg 
+	linux16 /vmlinuz-3.10.0-862.2.3.el7.x86_64 root=/dev/mapper/[01;31m[Kgrace[m[K-LogVol00 ro no_timer_check console=tty0 console=ttyS0,115200n8 net.ifnames=0 biosdevname=0 elevator=noop crashkernel=auto rd.lvm.lv=[01;31m[Kgrace[m[K/LogVol00 rd.lvm.lv=[01;31m[Kgrace[m[K/LogVol01 rhgb quiet 
+kroot@otuslinux04boot:~\[root@otuslinux04boot ~]# grep grace /boot/grub2/grub.cfg [C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[19@sed -i 's/VolGroup00/grace/g'[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[K/etc/fstab 
+kroot@otuslinux04boot:~\[root@otuslinux04boot ~]# sed -i 's/VolGroup00/grace/g' /etc/fstab [C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[9Pgrep grace /boot/grub2/grub.cfg[C[K/etc/fstab 
+/dev/mapper/[01;31m[Kgrace[m[K-LogVol00 /                       xfs     defaults        0 0
+/dev/mapper/[01;31m[Kgrace[m[K-LogVol01 swap                    swap    defaults        0 0
+kroot@otuslinux04boot:~\[root@otuslinux04boot ~]# update-initramfs -c -k all
+bash: update-initramfs: command not found
+kroot@otuslinux04boot:~\[root@otuslinux04boot ~]# t[Kyum provides update-inir[Ktramfs
+Loaded plugins: fastestmirror
+Loading mirror speeds from cached hostfile
+ * base: mirror.reconn.ru
+ * extras: mirror.nsc.liu.se
+ * updates: mirror.logol.ru
+base/7/x86_64/filelists_db            41% [===========-                ]  0.0 B/s | 2.9 MB  --:--:-- ETA base/7/x86_64/filelists_db            80% [======================-     ] 4.4 MB/s | 5.5 MB  00:00:00 ETA base/7/x86_64/filelists_db                                                        | 6.9 MB  00:00:00     
+extras/7/x86_64/filelists_db          69% [===================         ]  0.0 B/s | 417 kB  --:--:-- ETA extras/7/x86_64/filelists_db                                                      | 604 kB  00:00:00     
+updates/7/x86_64/filelists_db         52% [==============-             ]  0.0 B/s | 1.8 MB  --:--:-- ETA updates/7/x86_64/filelists_db         99% [===========================-] 2.6 MB/s | 3.3 MB  00:00:00 ETA updates/7/x86_64/filelists_db                                                     | 3.4 MB  00:00:00     
+No matches found
+kroot@otuslinux04boot:~\[root@otuslinux04boot ~]# sed [K[K[K[Kyum provides update-initramfs[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[3Pupdate-initramfs -c -k all[4Pgrep grace /etc/fstab [19@sed -i 's/VolGroup00/grace/g'[C[C[C[C[C[C[C[C[C[C[C[C[K/etc/initr[K[Ktram[K[K[K[K[K[K[K[K/
+Display all 184 possibilities? (y or n)
+[root@otuslinux04boot ~]# sed -i 's/VolGroup00/grace/g' /etc/i
+idmapd.conf  init.d/      inittab      inputrc      iproute2/    issue        issue.net    
+[root@otuslinux04boot ~]# sed -i 's/VolGroup00/grace/g' /etc/inid[Kt.d/ini[K[K[K[K[K[K
+init.d/  inittab  
+[root@otuslinux04boot ~]# sed -i 's/VolGroup00/grace/g' /etc/init[K[K[K[K[K[K[K[K[K[K[K[K[Kgrep -rn /etc/[KVOl[K[KolGroup00 /etc/
+[35m[K/etc/default/grub[m[K[36m[K:[m[K[32m[K6[m[K[36m[K:[m[KGRUB_CMDLINE_LINUX="no_timer_check console=tty0 console=ttyS0,115200n8 net.ifnames=0 biosdevname=0 elevator=noop crashkernel=auto rd.lvm.lv=[01;31m[KVolGroup00[m[K/LogVol00 rd.lvm.lv=[01;31m[KVolGroup00[m[K/LogVol01 rhgb quiet"
+[35m[K/etc/lvm/archive/VolGroup00_00000-1930758235.vg[m[K[36m[K:[m[K[32m[K11[m[K[36m[K:[m[K[01;31m[KVolGroup00[m[K {
+[35m[K/etc/lvm/archive/VolGroup00_00001-670986548.vg[m[K[36m[K:[m[K[32m[K6[m[K[36m[K:[m[Kdescription = "Created *before* executing 'vgrename [01;31m[KVolGroup00[m[K grace'"
+[35m[K/etc/lvm/archive/VolGroup00_00001-670986548.vg[m[K[36m[K:[m[K[32m[K11[m[K[36m[K:[m[K[01;31m[KVolGroup00[m[K {
+[35m[K/etc/lvm/backup/grace[m[K[36m[K:[m[K[32m[K6[m[K[36m[K:[m[Kdescription = "Created *after* executing 'vgrename [01;31m[KVolGroup00[m[K grace'"
+kroot@otuslinux04boot:~\[root@otuslinux04boot ~]# se[K[Kgrep -rn VolGroup00 /etc/yum provides update-initramfs[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[3Pupdate-initramfs -c -k all[4Pgrep grace /etc/fstab [19@sed -i 's/VolGroup00/grace/g'[C[C[C[C[C[C[C[C[C[C[C[C[C[K.et[K[K[K/etc/default/grub 
+kroot@otuslinux04boot:~\[root@otuslinux04boot ~]# sed -i 's/VolGroup00/grace/g' /etc/default/grub [C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[23Pgrep -rn VolGroup00 /etc/[K/boot/

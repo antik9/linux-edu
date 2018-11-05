@@ -1,0 +1,30 @@
+Script started on Mon 05 Nov 2018 09:07:12 PM UTC
+kroot@otuslinux04boot:~\[root@otuslinux04boot ~]# [H[J[root@otuslinux04boot ~]# cd /usr/lib/dracut/modules.d/
+kroot@otuslinux04boot:/usr/lib/dracut/modules.d\[root@otuslinux04boot modules.d]# mkdir [K[K[K[K[K[Krm -rf te[K[K1[K-[K01test/
+kroot@otuslinux04boot:/usr/lib/dracut/modules.d\[root@otuslinux04boot modules.d]# mkdir 01test
+kroot@otuslinux04boot:/usr/lib/dracut/modules.d\[root@otuslinux04boot modules.d]# cd 01test/
+kroot@otuslinux04boot:/usr/lib/dracut/modules.d/01test\[root@otuslinux04boot 01test]# cat >> modules[K[K[K[K[K[K[K[K modules[K-setup.sh [1P[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C<< 'msgend'
+> #!/bin/bash
+> check() {
+>  return 0
+> }
+> depends() {
+>  return 0
+> }
+> install() {
+>  inst_hook cleanup 00 "${moddir}/test.sh"
+> } 
+> msgend
+kroot@otuslinux04boot:/usr/lib/dracut/modules.d/01test\[root@otuslinux04boot 01test]# cat module-setup.sh 
+#!/bin/bash
+check() {
+ return 0
+}
+depends() {
+ return 0
+}
+install() {
+ inst_hook cleanup 00 "${moddir}/test.sh"
+} 
+[root@otuslinux04boot 01test]# vim test.sh
+[root@otuslinux04boot 01test]# dracut --force
