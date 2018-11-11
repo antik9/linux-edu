@@ -1,0 +1,12 @@
+[Unit]
+Description=Log Monitor Service For Key Word
+
+[Service]
+Type=simple
+User=vagrant
+EnvironmentFile=/etc/sysconfig/my-monitor
+ExecStart=/usr/local/bin/my-monitor.sh $FILE $WORD
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

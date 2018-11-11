@@ -1,0 +1,3 @@
+# Configuration for my-monitor
+FILE=/var/log/misc.log
+WORD="Hello World"

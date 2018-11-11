@@ -59,9 +59,9 @@ Vagrant.configure("2") do |config|
             box.vm.provider :virtualbox do |vb|
                 vb.customize ["modifyvm", :id,
                               "--memory", "200"]
-                # vb.customize ["storagectl", :id,
-                #               "--name", "SATA",
-                #               "--add", "sata" ]
+                vb.customize ["storagectl", :id,
+                              "--name", "SATA",
+                              "--add", "sata" ]
                 vb.name = boxname.to_s
 
                 boxconfig[:disks].each do |dname, dconf|

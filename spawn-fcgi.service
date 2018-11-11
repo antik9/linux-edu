@@ -1,0 +1,11 @@
+[Unit]
+Description=Spawn-Fcgi service
+
+[Service]
+Type=simple
+User=root
+EnvironmentFile=/etc/sysconfig/spawn-fcgi
+ExecStart=/bin/spawn-fcgi $OPTIONS
+
+[Install]
+WantedBy=multi-user.target
