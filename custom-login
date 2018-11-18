@@ -1,0 +1,5 @@
+#!/bin/bash
+
+[ $(date +%u) -lt 6 -o ! -z "$(groups $PAM_USER | grep -E ' admin($|\s)')" ] \
+	&& exit 0
+exit 1

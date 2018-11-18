@@ -1,0 +1,20 @@
+Script started on Sat 17 Nov 2018 10:07:30 PM UTC
+kroot@otuslinux04boot:~\[root@otuslinux04boot ~]# sudo useradd nr[Kewr[K-[K-root[1P[1P[1P[1P[1P[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C -s /bin/bash
+kroot@otuslinux04boot:~\[root@otuslinux04boot ~]# passwd new-root
+Changing password for user new-root.
+New password: 
+BAD PASSWORD: The password is shorter than 8 characters
+Retype new password: 
+passwd: all authentication tokens updated successfully.
+kroot@otuslinux04boot:~\[root@otuslinux04boot ~]# cat /etc/passwd | grep new-root
+[01;31m[Knew-root[m[K:x:1001:1003::/home/[01;31m[Knew-root[m[K:/bin/bash
+kroot@otuslinux04boot:~\[root@otuslinux04boot ~]# cat /etc/passwd | grep new-root[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[16Ppasswd[C[C[C[C[C[C[C[C[C[16@cat /etc/passwd | grep[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Ksudo [K[K[K[K[Ksed -i /[K'n[K/new-root/s/100./9[K0/g' /etc/passwd
+kroot@otuslinux04boot:~\[root@otuslinux04boot ~]# sed -i '/new-root/s/100./0/g' /etc/passwd[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[10Pcat /etc/passwd | grep new-root
+[01;31m[Knew-root[m[K:x:0:0::/home/[01;31m[Knew-root[m[K:/bin/bash
+kroot@otuslinux04boot:~\[root@otuslinux04boot ~]# su new-root whoami
+/bin/whoami: /bin/whoami: cannot execute binary file
+kroot@otuslinux04boot:~\[root@otuslinux04boot ~]# su new-root whoami-whoamicwhoami whoami
+root
+kroot@otuslinux04boot:~\[root@otuslinux04boot ~]# exit
+
+Script done on Sat 17 Nov 2018 10:16:19 PM UTC
