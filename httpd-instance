@@ -15,7 +15,6 @@
 # httpd binary at startup, set OPTIONS here.
 #
 OPTIONS="-f /etc/httpd/conf/httpd-instance.conf"
-NAME="Secondary"
 
 #
 # This setting ensures the httpd process is started in the "C" locale

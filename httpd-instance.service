@@ -5,9 +5,9 @@ Documentation=man:httpd(8)
 Documentation=man:apachectl(8)
 
 [Service]
-Type=simple
+Type=notify
 EnvironmentFile=/etc/sysconfig/httpd-instance
-ExecStart=/usr/sbin/httpd $OPTIONS -D $NAME
+ExecStart=/usr/sbin/httpd $OPTIONS -DFOREGROUND
 ExecReload=/usr/sbin/httpd $OPTIONS -k graceful
 ExecStop=/bin/kill -WINCH ${MAINPID}
 # We want systemd to give httpd some time to finish gracefully, but still want
