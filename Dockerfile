@@ -10,18 +10,18 @@ RUN yum install -y epel-release \
  && pip install requests uwsgi
 
 WORKDIR /home/
-RUN git clone http://github.com/antik9/OTUS_HOMEWORKS
+RUN git clone -b 08-rpm https://github.com/antik9/linux-otus.git ip2w
 
 # Change nginx.conf
-RUN  cp /home/OTUS_HOMEWORKS/HW_06_uwsgi/nginx_ip2w.conf /etc/nginx/default.d/nginx_ip2w.conf \
- && cp /home/OTUS_HOMEWORKS/HW_06_uwsgi/server/config_ip2w.json /usr/local/etc/config_ip2w.json \
- && cp /home/OTUS_HOMEWORKS/HW_06_uwsgi/server/ip2w.py /usr/local/bin/ip2w.py \
+RUN  cp /home/ip2w/nginx_ip2w.conf /etc/nginx/default.d/nginx_ip2w.conf \
+ && cp /home/ip2w/server/config_ip2w.json /usr/local/etc/config_ip2w.json \
+ && cp /home/ip2w/server/ip2w.py /usr/local/bin/ip2w.py \
  && mkdir /run/uwsgi
 
 # Open 80 port from container
 EXPOSE 80
 
-WORKDIR /home/OTUS_HOMEWORKS/HW_06_uwsgi/server
+WORKDIR /home/ip2w/server
 
 ENTRYPOINT /usr/sbin/nginx \
- && /bin/bash 
+ && uwsgi --ini ip2w.ini
