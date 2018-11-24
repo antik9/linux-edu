@@ -9,8 +9,7 @@ RUN yum install -y epel-release \
  && rm get-pip.py \
  && pip install requests uwsgi
 
-WORKDIR /home/
-RUN git clone -b 08-rpm https://github.com/antik9/linux-otus.git ip2w
+RUN git clone -b 08-rpm https://github.com/antik9/linux-otus.git /home/ip2w
 
 # Change nginx.conf
 RUN  cp /home/ip2w/nginx_ip2w.conf /etc/nginx/default.d/nginx_ip2w.conf \
