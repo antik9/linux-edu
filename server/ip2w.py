@@ -30,7 +30,7 @@ with open("/usr/local/etc/config_ip2w.json") as json_file:
     CONFIG = json.load(json_file)
 
 LOG_FILE = CONFIG.get("LOG_FILE")
-TOKEN = CONFIG.get("OPEN_WEATHER_TOKEN", os.environ.get("OPEN_WEATHER_TOKEN"))
+TOKEN = CONFIG.get("OPEN_WEATHER_TOKEN") or os.environ.get("OPEN_WEATHER_TOKEN")
 if not TOKEN:
     sys.exit("Provide OPEN_WEATHER_TOKEN for correct work of application")
 
