@@ -11,7 +11,7 @@ function get_tty ( ) {
 function get_cmd ( ) {
     CMDLINE=$(cat /proc/$1/cmdline | strings)
     [ "$CMDLINE" ] && echo $CMDLINE | tr $'\n' ' ' && exit 0
-    cat /proc/$1/comm
+    echo '['$(cat /proc/$1/comm)']'
 }
 
 function get_stats ( ) {
@@ -31,15 +31,22 @@ function get_stats ( ) {
         $FOREGROUND | sed 's/ \+//g'
 }
 
+function get_time ( ) {
+    TOTAL=$( awk '{ print ( $14 + $15 ) }' /proc/$1/stat )
+    printf "%d:%02d" $(( TOTAL / 3600 )) $(( TOTAL % 3600 / 60 ))
+}
+
 function read_proc_info ( ) {
     PID=$1
     TTY=$(get_tty $PID)
     CMD=$(get_cmd $PID)
+    TIME=$(get_time $PID)
     STATS=$(get_stats $PID)
     [ ! $? -eq 0 ] && return
-    printf "%-6s %-7s %-6s %s\n" $PID $TTY "$STATS" "$CMD"
+    printf "%5.5s %-8s %-6s %.7s %s\n" $PID $TTY "$STATS" "$TIME" "$CMD"
 }
 
+printf "%5.5s %-8s %-6s %.7s %s\n" PID TTY STAT TIME COMMAND
 for file in `ls /proc | grep -E '^[[:digit:]]{1,5}$' | sort -n`; do
     read_proc_info $file 2> /dev/null
 done
