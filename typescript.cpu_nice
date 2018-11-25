@@ -1,0 +1,26 @@
+Script started on 2018-11-25 20:49:38+03:00
+]0;/m/a/W/n/l/otus[30m[m[90mLinux localhost.localdomain 4.18.16-200.fc28.x86_64 x86_64
+ 20:49:38 up 3 days, 13:37,  2 users,  load average: 0.41, 0.66, 0.81
+[30m[m[?2004h]7;file://localhost.localdomain/media/antik/WorkDrive/ny2j/linux/otus]0;/m/a/W/n/l/otus[30m[m[2m⏎[m                                                                                                        ⏎ [2K(py36) [30m[m[30m[m[1m[38;2;204;204;204m[48;2;0;95;175m ◰³ py36 [30m[m[38;2;153;153;153m[48;2;51;51;51m[38;2;0;95;175m [38;2;153;153;153m/m/a/W/n/l/[1m[38;2;255;255;255m[48;2;51;51;51motus [30m[m[38;2;12;72;1m[48;2;173;220;16m[38;2;51;51;51m [38;2;12;72;1m 09-proc … [30m[m[30m[m[38;2;173;220;16m [30m[m[K[23C[90m Sun 25 Nov 2018 08:49:38 PM MSK[30m[m[73C[50C[H[J]0;/m/a/W/n/l/otus[30m[m(py36) [30m[m[30m[m[1m[38;2;204;204;204m[48;2;0;95;175m ◰³ py36 [30m[m[38;2;153;153;153m[48;2;51;51;51m[38;2;0;95;175m [38;2;153;153;153m/m/a/W/n/l/[1m[38;2;255;255;255m[48;2;51;51;51motus [30m[m[38;2;12;72;1m[48;2;173;220;16m[38;2;51;51;51m [38;2;12;72;1m 09-proc … [30m[m[30m[m[38;2;173;220;16m [30m[m[K[23C[90m Sun 25 Nov 2018 08:49:39 PM MSK[30m[m[73C[50Cs[22C[90m Sun 25 Nov 2018 08:49:39 PM MSK[30m[m[73C[51C[22C[90m Sun 25 Nov 2018 08:49:39 PM MSK[30m[m[73C[51C[1ms[22C[m[90m Sun 25 Nov 2018 08:49:39 PM MSK[30m[m[73C[51C[90mcript[17C[30m[m[90m Sun 25 Nov 2018 08:49:39 PM MSK[30m[m[73C[51C[1mu[m[K[21C[90m Sun 25 Nov 2018 08:49:39 PM MSK[30m[m[73C[52C[21C[90m Sun 25 Nov 2018 08:49:39 PM MSK[30m[m[73C[52C[90mdo ./cpu_nice.sh [4C[30m[m[90m Sun 25 Nov 2018 08:49:39 PM MSK[30m[m[73C[52C[1md[m[90mo ./cpu_nice.sh [4C[30m[m[90m Sun 25 Nov 2018 08:49:39 PM MSK[30m[m[73C[53C[20C[90m Sun 25 Nov 2018 08:49:39 PM MSK[30m[m[73C[53C[31msud[90mo ./cpu_nice.sh [4C[30m[m[90m Sun 25 Nov 2018 08:49:39 PM MSK[30m[m[73C[53C[31mo ./cpu_nice.sh [4C[30m[m[90m Sun 25 Nov 2018 08:49:39 PM MSK[30m[m[73C[69C[19D[1msudo[m [36m./cpu_nice.sh[30m[m [4C[90m Sun 25 Nov 2018 08:49:39 PM MSK[30m[m[73C[69C[4C[90m Sun 25 Nov 2018 08:49:39 PM MSK[30m[m[73C[69C
+[30m[m[?2004l]0;/m/a/W/n/l/otus[30m[m[sudo] password for antik: 
+Processes cpu usage:
+root     16695 32.0  1.2 414832 203560 pts/22  R+   20:49   0:00 /usr/bin/bash ./counter.sh second
+root     16694 32.3  1.2 416416 205084 pts/22  R+   20:49   0:00 /usr/bin/bash ./counter.sh first
+
+With equal nice
+	 First process took 11 seconds
+	 Second process took 11 seconds
+
+16721 (process ID) old priority 0, new priority -10
+16723 (process ID) old priority 0, new priority 10
+
+Processes cpu usage:
+root     16723  0.3  0.0 218476  7176 pts/22   RN+  20:50   0:00 /usr/bin/bash ./counter.sh second
+root     16721 65.0  1.2 416416 205128 pts/22  R<+  20:50   0:01 /usr/bin/bash ./counter.sh first
+
+With unequal nice
+	 First process took 6 seconds
+	 Second process took 11 seconds
+[?2004h]0;/m/a/W/n/l/otus[30m[m[2m⏎[m                                                                                                        ⏎ [2K(py36) [30m[m[30m[m[1m[38;2;204;204;204m[48;2;0;95;175m ◰³ py36 [30m[m[38;2;153;153;153m[48;2;51;51;51m[38;2;0;95;175m [38;2;153;153;153m/m/a/W/n/l/[1m[38;2;255;255;255m[48;2;51;51;51motus [30m[m[38;2;12;72;1m[48;2;173;220;16m[38;2;51;51;51m [38;2;12;72;1m 09-proc … [30m[m[30m[m[38;2;173;220;16m [30m[m[K[16C[90m26.3s[30m[m[90m  Sun 25 Nov 2018 08:50:12 PM MSK[30m[m[66C[50C
+[30m[m[30m[m[?2004l
+Script done on 2018-11-25 20:50:16+03:00
