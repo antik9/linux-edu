@@ -1,0 +1,4 @@
+---
+  hostname: ansible.custom.nginx
+  nginx_port: 8080
+  root_path: /usr/share/nginx/html
