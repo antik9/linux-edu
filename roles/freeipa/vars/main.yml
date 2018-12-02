@@ -1,0 +1,11 @@
+---
+    SERVER_HOST: 192.168.11.101
+    SERVER_HOSTNAME: ipa.otuslinuxfreeipa.org
+    SERVER_DOMAIN: otuslinuxfreeipa.org
+    MANAGER_PASS: KT2wtTkMhaLPYg
+    ADMIN_PASS: KT2wtTkMhaLPYg
+    SERVER_REALM: otuslinuxfreeipa.org
+    NEW_USER: foo
+    NEW_USER_PASS: simplepass
+    NEW_USER_FIRST_NAME: baz
+    NEW_USER_LAST_NAME: quux

@@ -1,0 +1,68 @@
+---
+  - name: Install ipa-server
+    package:
+        name: ipa-server
+        state: latest
+    register: install
+    tags:
+        - install
+
+  - name: Update /etc/hosts
+    when: install is success
+    shell: |
+        echo "{{ SERVER_HOST }} {{ SERVER_HOSTNAME }} {{ SERVER_DOMAIN }}" >> /etc/hosts
+    tags:
+        - system_config
+
+  - name: Run ipa-install-server
+    when: install is success
+    shell: >
+        ipa-server-install
+        --realm={{ SERVER_REALM }}
+        --domain={{ SERVER_DOMAIN }}
+        --ds-password={{ MANAGER_PASS }}
+        --admin-password={{ ADMIN_PASS }}
+        --hostname={{ SERVER_HOSTNAME }}
+        --unattended
+    register: server_ready
+    tags:
+        - install_server
+
+  - name: Enable admin user for Kerberos
+    when: server_ready is success
+    shell: >
+        echo {{ ADMIN_PASS }} | kinit admin
+    register: enable_admin
+    tags:
+        - server_config
+
+  - name: Add custom user to check work
+    when: enable_admin is success
+    shell: >
+        echo {{ NEW_USER_PASS }} |
+        ipa user-add {{ NEW_USER }}
+        --first {{ NEW_USER_FIRST_NAME }}
+        --last {{ NEW_USER_LAST_NAME }}
+        --password
+    register: add_user
+    tags:
+        - add_user
+
+  - name: Enable firewalld
+    systemd:
+        name: firewalld
+        enabled: True
+        state: started
+    tags:
+        - system_config
+
+  - name: Open ports for needed services for IPA
+    shell: >
+        firewall-cmd
+        --permanent
+        --add-service={http,https,ldap,ldaps,kerberos,dns,kpasswd,ntp}
+    notify:
+        - firewalld restart
+    register: open_ports
+    tags:
+        - system_config

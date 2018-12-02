@@ -1,0 +1,9 @@
+---
+    CLIENT_HOST: 192.168.11.102
+    CLIENT_HOSTNAME: client.org
+    CLIENT_DOMAIN: client.org
+    SERVER_HOST: 192.168.11.101
+    SERVER_HOSTNAME: ipa.otuslinuxfreeipa.org
+    SERVER_DOMAIN: otuslinuxfreeipa.org
+    PRINCIPLE: admin
+    ADMIN_PASS: KT2wtTkMhaLPYg

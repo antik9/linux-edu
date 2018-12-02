@@ -1,0 +1,39 @@
+---
+  - name: Check installation of module ipa-client-server
+    yum:
+        name: ipa-client.x86_64
+        state: present
+    register: is_installed
+
+  - name: Install ipa-client-server
+    when: is_installed is failed
+    package:
+        name: ipa-client
+        state: latest
+    register: install
+    tags:
+        - install
+
+  - name: Update /etc/hosts
+    when: is_installed is failed
+    shell: |
+        echo "{{ CLIENT_HOST }} {{ CLIENT_HOSTNAME }} {{ CLIENT_DOMAIN }}" >> /etc/hosts
+        echo "{{ SERVER_HOST }} {{ SERVER_HOSTNAME }} {{ SERVER_DOMAIN }}" >> /etc/hosts
+    tags:
+        - system_config
+
+  - name: Run ipa-client-install
+    when: is_installed is failed
+    shell: >
+        ipa-client-install
+        --domain={{ SERVER_DOMAIN }}
+        --principal={{ PRINCIPLE }}
+        --password={{ ADMIN_PASS }}
+        --hostname={{ CLIENT_HOSTNAME }}
+        --server={{ SERVER_HOSTNAME }}
+        --force-ntpd
+        --mkhomedir
+        --unattended
+    register: client_ready
+    tags:
+        - install_client
