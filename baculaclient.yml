@@ -1,0 +1,5 @@
+---
+- hosts: baculaclient
+  become: true
+  roles:
+    - client
