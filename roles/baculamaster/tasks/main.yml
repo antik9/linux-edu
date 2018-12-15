@@ -68,7 +68,6 @@
       state: started
   register: pg_started
   tags:
-      - config
       - postgres
 
 - name: Bacula initialization in Postgres
@@ -91,12 +90,13 @@
       echo "localhost:5432:bacula:bacula:{{ PG_BACULA_PASSWORD }}" > /var/spool/bacula/.pgpass
       chown bacula:bacula /var/spool/bacula/.pgpass
       chmod 600 /var/spool/bacula/.pgpass
-      systemctl restart postgresql
       touch /etc/postgres-inited
   register: pg_completed
   tags:
       - config
       - postgres
+  notify:
+      - postgres restart
 
 - name: Create backup directory
   when: pg_completed
@@ -122,63 +122,32 @@
       - bacula
       - selinux
 
-- name: Copying configuration files for bacula-dir
+- name: Copying configuration files for bacula
   when: backup_registered
   template:
-      src: bacula-dir.conf.j2
-      dest: /etc/bacula/bacula-dir.conf
+      src: "{{ item }}"
+      dest: /etc/bacula/{{ item | regex_replace('.j2') }}
       owner: bacula
       group: bacula
       mode: 0640
-  register: bacula_dir_inited
+  with_items:
+      - bacula-dir.conf.j2
+      - bacula-sd.conf.j2
+      - bconsole.conf.j2
+  register: bacula_inited
   tags:
       - config
       - bacula
 
-- name: Copying configuration files for bacula-sd
-  when: backup_registered
-  template:
-      src: bacula-sd.conf.j2
-      dest: /etc/bacula/bacula-sd.conf
-      owner: bacula
-      group: bacula
-      mode: 0640
-  register: bacula_sd_inited
-  tags:
-      - config
-      - bacula
-
-- name: Copying configuration files for bconsole
-  when: backup_registered
-  template:
-      src: bconsole.conf.j2
-      dest: /etc/bacula/bconsole.conf
-      owner: bacula
-      group: bacula
-      mode: 0640
-  register: bconsole_inited
-  tags:
-      - config
-      - bacula
-
-- name: Start bacula-dir service
-  when: bacula_dir_inited
+- name: Starting bacula services
+  when: bacula_inited
   systemd:
-      name: bacula-dir
+      name: "{{ item }}"
       enabled: True
       state: started
-  register: bacula_dir_started
+  with_items:
+      - bacula-dir
+      - bacula-sd
+  register: bacula_started
   tags:
-      - config
-      - bacula
-
-- name: Start bacula-sd service
-  when: bacula_sd_inited
-  systemd:
-      name: bacula-sd
-      enabled: True
-      state: started
-  register: bacula_sd_started
-  tags:
-      - config
       - bacula

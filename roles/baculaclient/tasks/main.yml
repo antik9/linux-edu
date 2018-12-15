@@ -16,18 +16,10 @@
       dest: /etc/bacula/bacula-fd.conf
       owner: bacula
       group: bacula
+      mode: 0640
   register: bacula_dir_inited
   tags:
       - config
       - bacula
-
-- name: Start bacula-fd service
-  when: bacula_dir_inited
-  systemd:
-      name: bacula-fd
-      enabled: True
-      state: started
-  register: bacula_df_started
-  tags:
-      - config
-      - bacula
+  notify:
+      - bacula-fd start

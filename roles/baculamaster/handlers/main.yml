@@ -1,2 +1,6 @@
 ---
 # handlers file for baculamaster
+- name: postgres restart
+  systemd:
+      name: postgresql
+      state: restarted
