@@ -1,2 +1,184 @@
 ---
 # tasks file for baculamaster
+- name: Policy-core install
+  yum:
+      name: policycoreutils-python
+      state: latest
+  tags:
+      - install
+      - selinux
+
+- name: Check install
+  ignore_errors: True
+  shell: >
+      [ -f /etc/postgres-inited ]
+  register: pg_is_configured
+  tags:
+      - install
+      - config
+
+- name: Postgres-server installation
+  when: pg_is_configured is failed
+  yum:
+      name: postgresql-server
+      state: latest
+  tags:
+      - install
+      - postgres
+
+- name: Bacula installation
+  when: pg_is_configured is failed
+  yum:
+      name:
+          - bacula-director
+          - bacula-storage
+          - bacula-console
+          - bacula-client
+      state: latest
+  tags:
+      - install
+      - bacula
+
+- name: Postgres initialization
+  when: pg_is_configured is failed
+  shell: >
+      postgresql-setup initdb
+  register: pg_inited
+  tags:
+      - config
+      - postgres
+
+- name: Copying pg_hba.conf to machine
+  when: pg_inited
+  copy:
+      src: pg_hba.conf
+      dest: /var/lib/pgsql/data/pg_hba.conf
+      owner: postgres
+      group: postgres
+      mode: 0600
+  tags:
+      - config
+      - postgres
+
+- name: Postgres start
+  when: pg_inited
+  systemd:
+      name: postgresql
+      enabled: True
+      state: started
+  register: pg_started
+  tags:
+      - config
+      - postgres
+
+- name: Bacula initialization in Postgres
+  when: pg_started
+  become: true
+  become_user: postgres
+  shell: |
+      /usr/libexec/bacula/create_postgresql_database
+      /usr/libexec/bacula/make_postgresql_tables
+      /usr/libexec/bacula/grant_postgresql_privileges
+      psql bacula -c "alter user bacula with password '{{ PG_BACULA_PASSWORD }}'"
+  register: bacula_pg_inited
+  tags:
+      - config
+      - postgres
+
+- name: Create pgpass
+  when: bacula_pg_inited
+  shell: |
+      echo "localhost:5432:bacula:bacula:{{ PG_BACULA_PASSWORD }}" > /var/spool/bacula/.pgpass
+      chown bacula:bacula /var/spool/bacula/.pgpass
+      chmod 600 /var/spool/bacula/.pgpass
+      systemctl restart postgresql
+      touch /etc/postgres-inited
+  register: pg_completed
+  tags:
+      - config
+      - postgres
+
+- name: Create backup directory
+  when: pg_completed
+  file:
+      path: /bacula/backup
+      state: directory
+      owner: bacula
+      group: bacula
+  register: backup_dir
+  tags:
+      - config
+      - bacula
+
+- name: Selinux register backup directory for bacula
+  when: backup_dir
+  shell: |
+      chcon system_u:object_r:bacula_store_t:s0 /bacula/backup/
+      semanage fcontext -a -t bacula_store_t "/bacula/backup(/.*)?"
+      restorecon -R -v /bacula/backup
+  register: backup_registered
+  tags:
+      - config
+      - bacula
+      - selinux
+
+- name: Copying configuration files for bacula-dir
+  when: backup_registered
+  template:
+      src: bacula-dir.conf.j2
+      dest: /etc/bacula/bacula-dir.conf
+      owner: bacula
+      group: bacula
+      mode: 0640
+  register: bacula_dir_inited
+  tags:
+      - config
+      - bacula
+
+- name: Copying configuration files for bacula-sd
+  when: backup_registered
+  template:
+      src: bacula-sd.conf.j2
+      dest: /etc/bacula/bacula-sd.conf
+      owner: bacula
+      group: bacula
+      mode: 0640
+  register: bacula_sd_inited
+  tags:
+      - config
+      - bacula
+
+- name: Copying configuration files for bconsole
+  when: backup_registered
+  template:
+      src: bconsole.conf.j2
+      dest: /etc/bacula/bconsole.conf
+      owner: bacula
+      group: bacula
+      mode: 0640
+  register: bconsole_inited
+  tags:
+      - config
+      - bacula
+
+- name: Start bacula-dir service
+  when: bacula_dir_inited
+  systemd:
+      name: bacula-dir
+      enabled: True
+      state: started
+  register: bacula_dir_started
+  tags:
+      - config
+      - bacula
+
+- name: Start bacula-sd service
+  when: bacula_sd_inited
+  systemd:
+      name: bacula-sd
+      enabled: True
+      state: started
+  register: bacula_sd_started
+  tags:
+      - config
+      - bacula

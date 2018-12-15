@@ -2,4 +2,4 @@
   - hosts: baculamaster
     become: true
     roles:
-        - freeipa
+        - baculamaster

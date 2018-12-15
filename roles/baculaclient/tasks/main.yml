@@ -1,2 +1,33 @@
 ---
-# tasks file for baculaclient
+- name: Bacula installation
+  yum:
+      name:
+          - bacula-client
+      state: latest
+  register: client_installed
+  tags:
+      - install
+      - bacula
+
+- name: Copying configuration files for bacula-fd
+  when: client_installed
+  template:
+      src: bacula-fd.conf.j2
+      dest: /etc/bacula/bacula-fd.conf
+      owner: bacula
+      group: bacula
+  register: bacula_dir_inited
+  tags:
+      - config
+      - bacula
+
+- name: Start bacula-fd service
+  when: bacula_dir_inited
+  systemd:
+      name: bacula-fd
+      enabled: True
+      state: started
+  register: bacula_df_started
+  tags:
+      - config
+      - bacula

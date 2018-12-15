@@ -27,13 +27,11 @@ Vagrant.configure("2") do |config|
 
             box.vm.network "private_network", ip: boxconfig[:ip_addr]
 
-            vb.cpus = 1;
-            vb.memory = 256;
+            box.vm.provider :virtualbox do |vb|
+                vb.cpus = 1;
+                vb.memory = 256;
+            end
 
-            # box.vm.provider :virtualbox do |vb|
-            #     vb.cpus = (boxname.to_s == 'otuslinuxfreeipa') ? 2 : 1;
-            #     vb.memory = (boxname.to_s == 'otuslinuxfreeipa') ? 4096 : 1024;
-            # end
 
             box.vm.provision "shell", inline: <<-SHELL
                 mkdir -p ~root/.ssh
@@ -41,8 +39,9 @@ Vagrant.configure("2") do |config|
             SHELL
 
             config.vm.provision "ansible" do |ansible|
-                ansible.verbose = '-vvv'
+                ansible.verbose = '-vv'
                 ansible.playbook = "#{boxname.to_s}.yml"
+                ansible.inventory_path = "hosts"
             end
 
         end
