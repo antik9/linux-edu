@@ -1,0 +1,18 @@
+Connecting to Director localhost:9101
+1000 OK: bacula-dir Version: 5.2.13 (19 February 2013)
+Enter a period to cancel a command.
+list files jobid=17
+Automatically selected Catalog: MyCatalog
+Using Catalog "MyCatalog"
++-------------+
+| filename    |
++-------------+
+| /etc/wgetrc |
+| /etc/       |
++-------------+
++-------+-----------+---------------------+------+-------+----------+----------+-----------+
+| jobid | name      | starttime           | type | level | jobfiles | jobbytes | jobstatus |
++-------+-----------+---------------------+------+-------+----------+----------+-----------+
+|    17 | BackupEtc | 2018-12-15 23:15:03 | B    | I     |        2 |    2,930 | T         |
++-------+-----------+---------------------+------+-------+----------+----------+-----------+
+You have messages.

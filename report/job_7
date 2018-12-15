@@ -1,0 +1,19 @@
+Connecting to Director localhost:9101
+1000 OK: bacula-dir Version: 5.2.13 (19 February 2013)
+Enter a period to cancel a command.
+list files jobid=7
+Automatically selected Catalog: MyCatalog
+Using Catalog "MyCatalog"
++------------------+
+| filename         |
++------------------+
+| /etc/nanorc      |
+| /etc/ld.so.cache |
+| /etc/            |
++------------------+
++-------+-----------+---------------------+------+-------+----------+----------+-----------+
+| jobid | name      | starttime           | type | level | jobfiles | jobbytes | jobstatus |
++-------+-----------+---------------------+------+-------+----------+----------+-----------+
+|     7 | BackupEtc | 2018-12-15 22:00:03 | B    | D     |        3 |   13,578 | T         |
++-------+-----------+---------------------+------+-------+----------+----------+-----------+
+You have messages.

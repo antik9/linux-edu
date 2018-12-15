@@ -1,0 +1,28 @@
+Connecting to Director localhost:9101
+1000 OK: bacula-dir Version: 5.2.13 (19 February 2013)
+Enter a period to cancel a command.
+list jobs
+Automatically selected Catalog: MyCatalog
+Using Catalog "MyCatalog"
++-------+-----------+---------------------+------+-------+----------+------------+-----------+
+| jobid | name      | starttime           | type | level | jobfiles | jobbytes   | jobstatus |
++-------+-----------+---------------------+------+-------+----------+------------+-----------+
+|     1 | BackupEtc | 2018-12-15 21:15:02 | B    | F     |    2,383 | 12,482,698 | T         |
+|     2 | BackupEtc | 2018-12-15 21:25:02 | B    | I     |        0 |          0 | T         |
+|     3 | BackupEtc | 2018-12-15 21:30:02 | B    | D     |        2 |      4,883 | T         |
+|     4 | BackupEtc | 2018-12-15 21:35:02 | B    | I     |        0 |          0 | T         |
+|     5 | BackupEtc | 2018-12-15 21:45:03 | B    | I     |        0 |          0 | T         |
+|     6 | BackupEtc | 2018-12-15 21:55:02 | B    | I     |        2 |      8,695 | T         |
+|     7 | BackupEtc | 2018-12-15 22:00:03 | B    | D     |        3 |     13,578 | T         |
+|     8 | BackupEtc | 2018-12-15 22:05:03 | B    | I     |        0 |          0 | T         |
+|     9 | BackupEtc | 2018-12-15 22:15:03 | B    | I     |        0 |          0 | T         |
+|    10 | BackupEtc | 2018-12-15 22:25:03 | B    | I     |        0 |          0 | T         |
+|    11 | BackupEtc | 2018-12-15 22:30:03 | B    | D     |        3 |     13,578 | T         |
+|    12 | BackupEtc | 2018-12-15 22:35:03 | B    | I     |        0 |          0 | T         |
+|    13 | BackupEtc | 2018-12-15 22:45:03 | B    | I     |        9 |      2,640 | T         |
+|    14 | BackupEtc | 2018-12-15 22:55:03 | B    | I     |        0 |          0 | T         |
+|    15 | BackupEtc | 2018-12-15 23:00:03 | B    | D     |       11 |     16,218 | T         |
+|    16 | BackupEtc | 2018-12-15 23:05:03 | B    | I     |        0 |          0 | T         |
+|    17 | BackupEtc | 2018-12-15 23:15:03 | B    | I     |        2 |      2,930 | T         |
++-------+-----------+---------------------+------+-------+----------+------------+-----------+
+You have messages.
