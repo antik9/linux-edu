@@ -1,0 +1,99 @@
+---
+# tasks file for webserver
+
+- name: Install epel-release, audispd-plugins
+  yum:
+      name:
+        - epel-release
+        - audispd-plugins
+      state: latest
+  register: epel_installed
+  tags:
+      - install
+      - epel_release
+
+- name: Install nginx
+  when: epel_installed is success
+  yum:
+      name: nginx
+      state: latest
+  register: nginx_installed
+  tags:
+      - install
+      - nginx
+
+- name: Copy index.html
+  when: nginx_installed is success
+  copy:
+      src: index.html
+      dest: /usr/share/nginx/html
+      owner: nginx
+      group: nginx
+      mode: 0644
+  register: index_copied
+  tags:
+      - config
+      - nginx
+  notify:
+      - nginx start
+
+- name: Copy nginx config
+  when: nginx_installed is success
+  template:
+      src: nginx.conf.j2
+      dest: /etc/nginx/nginx.conf
+      owner: nginx
+      group: nginx
+      mode: 0644
+  register: nginx_conf_copied
+  tags:
+      - config
+      - nginx
+  notify:
+      - nginx start
+
+- name: Copy audisp-remote config
+  when: epel_installed is success
+  template:
+      src: audisp-remote.conf.j2
+      dest: /etc/audisp/audisp-remote.conf
+      mode: 0640
+  register: audisp_remote_copied
+  tags:
+      - config
+      - auditd
+  notify:
+      - Audit nginx watch
+
+- name: Copy activated config for au-remote
+  when: epel_installed is success
+  copy:
+      src: au-remote.conf
+      dest: /etc/audisp/plugins.d/au-remote.conf
+      mode: 0640
+  register: au_remote_copied
+  tags:
+      - config
+      - auditd
+  notify:
+      - Audit nginx watch
+
+- name: Copy config for auditd
+  copy:
+      src: auditd.conf
+      dest: /etc/audit/auditd.conf
+      mode: 0640
+  register: auditd_copied
+  tags:
+      - config
+      - auditd
+
+- name: Restart auditd
+  when: audisp_remote_copied is success and au_remote_copied is success and auditd_copied is success
+  shell: >
+      service auditd restart
+  register: auditd_restarted
+  tags:
+      - auditd
+  notify:
+      - Audit nginx watch

@@ -1,0 +1,11 @@
+---
+# handlers file for webserver
+- name: nginx start
+  systemd:
+      name: nginx
+      state: started
+      enabled: True
+
+- name: Audit nginx watch
+  shell: >
+      auditctl -w /etc/nginx -k nginx_watch

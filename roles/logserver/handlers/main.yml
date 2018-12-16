@@ -1,0 +1,12 @@
+---
+# handlers file for webserver
+- name: Start firewalld
+  systemd:
+      name: firewalld
+      state: started
+      enabled: True
+
+- name: Restart rsyslog
+  systemd:
+      name: rsyslog
+      state: restarted

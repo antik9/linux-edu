@@ -1,0 +1,5 @@
+---
+- hosts: logserver
+  become: true
+  roles:
+    - logserver

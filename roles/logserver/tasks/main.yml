@@ -1,0 +1,58 @@
+---
+# tasks file for logserver
+- name: Install firewalld
+  yum:
+      name:
+          - firewalld
+      state: latest
+  register: prerequisites
+  tags:
+      - install
+  notify:
+      - Start firewalld
+
+- name: Copy rsyslog.conf
+  template:
+      src: rsyslog.conf.j2
+      dest: /etc/rsyslog.conf
+      mode: 0644
+  register: rsyslog_conf_copied
+  tags:
+      - config
+      - rsyslog
+  notify:
+      - Restart rsyslog
+
+- name: Copy auditd.conf
+  template:
+      src: auditd.conf.j2
+      dest: /etc/audit/auditd.conf
+      mode: 0640
+  register: auditd_conf_copied
+  tags:
+      - config
+      - auditd
+
+- name: Enable firewall ports
+  when: prerequisites is success
+  firewalld:
+      port: "{{ item }}"
+      permanent: yes
+      state: enabled
+      zone: public
+  with_items:
+      - 60/tcp
+      - 514/udp
+      - 514/tcp
+  register: ports_enabled
+  tags:
+      - config
+      - firewalld
+
+- name: Restart auditd
+  when: auditd_conf_copied is success
+  shell: >
+      service auditd restart
+  register: auditd_restarted
+  tags:
+      - auditd
