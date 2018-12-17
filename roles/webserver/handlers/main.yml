@@ -9,3 +9,8 @@
 - name: Audit nginx watch
   shell: >
       auditctl -w /etc/nginx -k nginx_watch
+
+- name: Restart rsyslog
+  systemd:
+      name: rsyslog
+      state: restarted

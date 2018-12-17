@@ -1,5 +1,6 @@
 ---
 # vars file for webserver
     LOGSERVER: 192.168.11.102
+    LOGSERVER_NAME: logserver
     SYSLOG_PORT: 514
     AUDITD_PORT: 60

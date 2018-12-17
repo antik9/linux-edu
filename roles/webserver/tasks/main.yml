@@ -88,6 +88,18 @@
       - config
       - auditd
 
+- name: Copy config for rsyslog
+  template:
+      src: rsyslog.conf.j2
+      dest: /etc/rsyslog.conf
+      mode: 0640
+  register: rsyslog_copied
+  tags:
+      - config
+      - rsyslog
+  notify:
+      - Restart rsyslog
+
 - name: Restart auditd
   when: audisp_remote_copied is success and au_remote_copied is success and auditd_copied is success
   shell: >
