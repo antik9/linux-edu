@@ -1,0 +1,198 @@
+---
+# tasks file for zabbix-server
+- name: enable REPO
+  shell: >
+      rpm -Uvh https://repo.zabbix.com/zabbix/4.0/rhel/7/x86_64/zabbix-release-4.0-1.el7.noarch.rpm
+  register: enable_repo
+  ignore_errors: True
+  tags:
+      - config
+      - zabbix
+
+- name: install epel-release
+  yum:
+      name:
+        - epel-release
+        - yum-utils
+        - policycoreutils-python
+      state: latest
+  register: install_epel
+  tags:
+      - install
+      - epel
+
+- name: install nginx
+  yum:
+      name:
+        - nginx
+      state: latest
+  register: install_nginx
+  tags:
+      - install
+      - nginx
+  notify:
+      - start nginx
+
+- name: copy default.conf to nginx/conf.d
+  copy:
+      src: default.conf
+      dest: /etc/nginx/conf.d/
+      mode: 0644
+  tags:
+      - nginx
+      - config
+
+- name: enable remi-release
+  when: install_epel is success
+  shell: |
+      rpm -Uhv http://rpms.remirepo.net/enterprise/remi-release-7.rpm
+      yum-config-manager --enable remi-php71
+  register: enable_remi
+  tags:
+      - config
+      - php
+
+- name: install php packages
+  when: enable_remi is success
+  yum:
+      name:
+          - php71
+          - php-fpm
+          - php-cli
+          - php-pgsql
+          - php-gd
+          - php-ldap
+          - php-odbc
+          - php-pdo
+          - php-pecl-memcache
+          - php-pear
+          - php-xml
+          - php-xmlrpc
+          - php-mbstring
+          - php-snmp
+          - php-soap
+          - php-bcmath
+      state: latest
+  register: install_php
+  tags:
+      - install
+      - php
+  notify:
+      - start php-fpm
+
+- name: copy php-from config
+  copy:
+      src: www.conf
+      dest: /etc/php-fpm.d/
+      mode: 0644
+  register: copy_php_fpm
+  tags:
+      - config
+      - php
+
+- name: install postgres
+  yum:
+      name: postgresql-server
+      state: latest
+  register: install_postgres
+  tags:
+      - install
+      - postgres
+
+- name: Postgres initialization
+  when: install_postgres is success
+  shell: >
+      postgresql-setup initdb
+  register: pg_inited
+  tags:
+      - config
+      - postgres
+
+- name: copy pg_hba.conf
+  when: pg_inited is success
+  copy:
+      src: pg_hba.conf
+      dest: /var/lib/pgsql/data/
+      mode: 0600
+      owner: postgres
+      group: postgres
+  register: pg_hba_copied
+  tags:
+      - postgres
+      - config
+
+- name: start postgres
+  when: pg_inited is success and pg_hba_copied is success
+  systemd:
+      name: postgresql
+      state: started
+  register: postgres_started
+  tags:
+      - postgres
+
+- name: install zabbix
+  when: enable_repo is success
+  yum:
+      enablerepo: zabbix
+      name:
+          - zabbix-server-pgsql
+          - zabbix-web
+          - zabbix-agent
+      state: latest
+  register: install_zabbix
+  tags:
+      - install
+      - zabbix
+
+- name: initiate zabbix in postgres
+  when: postgres_started is success and install_zabbix is success
+  shell: |
+      psql -Upostgres -c 'create database zabbix;'
+      psql -Upostgres -c "create user zabbix with encrypted password '{{ ZABBIX_DB_PASS }}';"
+      psql -Upostgres -c "grant all privileges on database zabbix to zabbix;"
+      zcat /usr/share/doc/zabbix-server-pgsql*/create.sql.gz | psql -Uzabbix zabbix
+      sed -i '/local.*trust/s/trust/md5/' /var/lib/pgsql/data/pg_hba.conf
+  register: zabbix_psql_inited
+  tags:
+      - zabbix
+      - postgres
+
+- name: copy zabbix_server.conf
+  template:
+      src: zabbix_server.conf.j2
+      dest: /etc/zabbix/zabbix_server.conf
+      mode: 0640
+      group: zabbix
+  register: zabbix_copied
+  tags:
+      - zabbix
+      - config
+
+- name: enable selinux for zabbix
+  when: install_zabbix is success
+  ignore_errors: True
+  shell: |
+      curl https://support.zabbix.com/secure/attachment/53320/zabbix_server_add.te > zabbix_server_add.te
+      checkmodule -M -m -o zabbix_server_add.mod zabbix_server_add.te
+      semodule_package -m zabbix_server_add.mod -o zabbix_server_add.pp
+      semodule -i zabbix_server_add.pp
+  register: selinux_zabbix_enabled
+  tags:
+      - selinux
+      - zabbix
+  notify:
+      - start zabbix-server
+      - start zabbix-agent
+
+- name: enable other permissions
+  when: selinux_zabbix_enabled is success and install_php is success and install_nginx is success
+  shell: |
+      chown -R nginx:nginx /var/lib/php/session
+      chown -R nginx:nginx /etc/zabbix/web
+      setsebool -P httpd_can_connect_zabbix on
+      setsebool -P httpd_can_network_connect_db on
+  register: permissions_enabled
+  tags:
+      - config
+      - nginx
+      - zabbix

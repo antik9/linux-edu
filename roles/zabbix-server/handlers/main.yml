@@ -1,0 +1,31 @@
+---
+# handlers file for zabbix-server
+- name: start nginx
+  systemd:
+      name: nginx
+      enabled: True
+      state: started
+
+- name: start php-fpm
+  systemd:
+      name: php-fpm
+      enabled: True
+      state: started
+
+- name: restart php-fpm
+  systemd:
+      name: php-fpm
+      enabled: True
+      state: restarted
+
+- name: start zabbix-server
+  systemd:
+      name: zabbix-server
+      enabled: True
+      state: restarted
+
+- name: start zabbix-agent
+  systemd:
+      name: zabbix-agent
+      enabled: True
+      state: restarted
