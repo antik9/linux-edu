@@ -1,0 +1,11 @@
+version: '3.3'
+
+services:
+    nginx:
+        image: docker.io/antik9/linux-otus-nginx:latest
+        ports:
+            - "8080:80"
+        links:
+            - app
+    app:
+        image: docker.io/antik9/flask-simple-app:latest
