@@ -1,0 +1,16 @@
+dev {{ VPN_INTERFACE }}
+proto {{ PROTOCOL }}
+remote {{ SERVER_IP }} {{ SERVER_PORT }}
+
+client
+resolv-retry infinite
+
+ca /etc/openvpn/ca.crt
+cert /etc/openvpn/client.crt
+key /etc/openvpn/client.key
+
+persist-key
+persist-tun
+comp-lzo
+verb 3
+status-version 3

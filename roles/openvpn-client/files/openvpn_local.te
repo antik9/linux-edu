@@ -1,0 +1,14 @@
+
+module openvpn_local 1.0;
+
+require {
+	type openvpn_t;
+	type user_home_t;
+	class file open;
+}
+
+#============= openvpn_t ==============
+
+#!!!! The file '/etc/openvpn/client.conf' is mislabeled on your system.  
+#!!!! Fix with $ restorecon -R -v /etc/openvpn/client.conf
+allow openvpn_t user_home_t:file open;

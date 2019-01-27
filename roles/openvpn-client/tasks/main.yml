@@ -1,0 +1,59 @@
+---
+- name: Install epel-release
+  yum:
+      name: epel-release
+      state: latest
+  register: install_epel
+
+- name: Install openvpn and policycoreutils
+  when: install_epel is success
+  yum:
+      name:
+          - openvpn
+          - iperf
+          - policycoreutils-python
+      state: latest
+  register: install_openvpn
+  tags:
+      - installation
+      - openvpn
+
+- name: Transfer certificates from server
+  when: install_openvpn is success
+  shell: |
+      scp -o StrictHostKeyChecking=no "{{ SERVER_IP }}:/etc/openvpn/ca.crt" "/etc/openvpn/ca.crt"
+      scp -o StrictHostKeyChecking=no "{{ SERVER_IP }}:/etc/openvpn/{{ ROLE }}.crt" \
+        "/etc/openvpn/{{ ROLE }}.crt"
+      scp -o StrictHostKeyChecking=no "{{ SERVER_IP }}:/etc/openvpn/{{ ROLE }}.key" \
+        "/etc/openvpn/{{ ROLE }}.key"
+  register: certs_transfered
+
+- name: Copy client config
+  template:
+      src: "{{ ROLE }}.conf.j2"
+      dest: "/etc/openvpn/{{ ROLE }}.conf"
+      mode: 0644
+  register: config_copied
+  tags:
+      - configuration
+      - openvpn
+
+- name: Copy selinux policy file
+  copy:
+      src: openvpn_local.te
+      dest: /tmp/openvpn_local.te
+      mode: 0644
+
+- name: Build Selinux module for correct work
+  shell: |
+      cd /tmp
+      [ -n "$(semodule --list-modules | grep openvpn_local)" ] \
+        || (checkmodule -M -m -o openvpn_local.mod openvpn_local.te \
+        && semodule_package -o openvpn_local.pp -m openvpn_local.mod \
+        &&  semodule -i openvpn_local.pp)
+  register: selinux_configured
+  tags:
+      - configuration
+      - selinux
+  notify:
+      - start openvpn

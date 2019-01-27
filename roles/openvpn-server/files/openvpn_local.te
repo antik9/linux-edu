@@ -1,0 +1,18 @@
+module openvpn_local 1.0;
+
+require {
+    type openvpn_t;
+    type user_home_t;
+    type unreserved_port_t;
+    class tcp_socket name_bind;
+    class file open;
+}
+
+#============= openvpn_t ==============
+
+#!!!! This avc can be allowed using the boolean 'nis_enabled'
+allow openvpn_t unreserved_port_t:tcp_socket name_bind;
+
+#!!!! The file '/etc/openvpn/dh.pem' is mislabeled on your system.
+#!!!! Fix with $ restorecon -R -v /etc/openvpn/dh.pem
+allow openvpn_t user_home_t:file open;

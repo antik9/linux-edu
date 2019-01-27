@@ -1,0 +1,82 @@
+---
+- name: Install epel-release
+  yum:
+      name: epel-release
+      state: latest
+  register: install_epel
+
+- name: Install openvpn easyrsa and policycoreutils
+  when: install_epel is success
+  yum:
+      name:
+          - openvpn
+          - easy-rsa
+          - iperf
+          - policycoreutils-python
+      state: latest
+  register: install_openvpn
+  tags:
+      - installation
+      - openvpn
+
+- name: Configure openvpn
+  when: install_openvpn is success
+  shell: |
+      [ -e /etc/openvpn/.configured ] \
+        || (export easyrsa=$(find / -name easyrsa -type f | head -1) \
+        && $easyrsa init-pki \
+        && echo | $easyrsa build-ca nopass \
+        && $easyrsa build-server-full server nopass \
+        && $easyrsa build-client-full client nopass \
+        && $easyrsa build-client-full local nopass \
+        && $easyrsa gen-dh \
+        && mv ./pki/dh.pem /etc/openvpn/dh.pem \
+        && mv ./pki/private/client.key /etc/openvpn/ \
+        && mv ./pki/private/local.key /etc/openvpn/ \
+        && mv ./pki/private/server.key /etc/openvpn/ \
+        && mv ./pki/ca.crt /etc/openvpn/ \
+        && mv ./pki/issued/client.crt /etc/openvpn/ \
+        && mv ./pki/issued/local.crt /etc/openvpn/ \
+        && mv ./pki/issued/server.crt /etc/openvpn/ \
+        && chmod 0644 /etc/openvpn/ca.crt /etc/openvpn/client.crt /etc/openvpn/client.key \
+        && chmod 0644 /etc/openvpn/local.crt /etc/openvpn/local.key \
+        && mkdir -p /var/log/openvpn \
+        && mkdir -p /etc/openvpn/ccd \
+        && echo "iroute {{ COMMON_NET }} {{ COMMON_NETMASK }}" > /etc/openvpn/ccd/client \
+        && touch /etc/openvpn/.configured)
+  register: configure_openvpn
+  tags:
+      - configuration
+      - openvpn
+
+- name: Copy openvpn.conf
+  when: configure_openvpn is success
+  template:
+      src: openvpn.conf.j2
+      dest: /etc/openvpn/server.conf
+      mode: 0644
+      group: openvpn
+  register: copy_server_config
+  tags:
+      - configuration
+      - openvpn
+
+- name: Copy Selinux policy file
+  copy:
+      src: openvpn_local.te
+      dest: /tmp/openvpn_local.te
+      mode: 0644
+
+- name: Build Selinux module for correct work
+  shell: |
+      cd /tmp
+      [ -n "$(semodule --list-modules | grep openvpn_local)" ] \
+        || (checkmodule -M -m -o openvpn_local.mod openvpn_local.te \
+        && semodule_package -o openvpn_local.pp -m openvpn_local.mod \
+        &&  semodule -i openvpn_local.pp)
+  register: selinux_configured
+  tags:
+      - configuration
+      - selinux
+  notify:
+      - start openvpn

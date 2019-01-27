@@ -1,0 +1,6 @@
+---
+- name: start openvpn
+  systemd:
+      name: openvpn@server
+      enabled: True
+      state: started
