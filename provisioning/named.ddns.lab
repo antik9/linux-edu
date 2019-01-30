@@ -1,0 +1,14 @@
+$ORIGIN .
+$TTL 3600	; 1 hour
+ddns.lab		IN SOA	ns01.dns.lab. root.dns.lab. (
+				2711201408 ; serial
+				3600       ; refresh (1 hour)
+				600        ; retry (10 minutes)
+				86400      ; expire (1 day)
+				600        ; minimum (10 minutes)
+				)
+			NS	ns01.dns.lab.
+			NS	ns02.dns.lab.
+$ORIGIN ddns.lab.
+ns01			A	192.168.50.10
+ns02			A	192.168.50.11

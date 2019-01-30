@@ -1,0 +1,13 @@
+
+module local_named 1.0;
+
+require {
+	type etc_t;
+	type named_t;
+	class file { create rename unlink write };
+}
+
+#============= named_t ==============
+
+#!!!! WARNING: 'etc_t' is a base type.
+allow named_t etc_t:file { create rename unlink write };

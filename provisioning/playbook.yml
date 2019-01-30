@@ -1,0 +1,70 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+  - name: install packages
+    yum: name={{ item }} state=latest
+    with_items:
+      - bind
+      - bind-utils
+      - ntp
+      - policycoreutils-python
+      - tcpdump
+
+  - name: copy transferkey to all servers and the client
+    copy: src=named.zonetransfer.key dest=/etc/named.zonetransfer.key owner=root group=named mode=0644
+
+- hosts: ns01
+  become: yes
+  tasks:
+  - name: copy local_named.te
+    copy: src=local_named.te dest=/tmp/local_named.te mode=0644
+  - name: enable policy
+    shell: |
+        cd /tmp \
+        && checkmodule -M -m -o local_named.mod local_named.te \
+        && semodule_package -o local_named.pp -m local_named.mod \
+        && semodule -i local_named.pp
+  - name: copy named.conf
+    copy: src=master-named.conf dest=/etc/named.conf owner=root group=named mode=0640
+  - name: copy named.conf
+    copy: src=master-named.conf dest=/etc/named.conf owner=root group=named mode=0640
+  - name: copy zones
+    copy: src={{ item }} dest=/etc/named/ owner=root group=named mode=0660
+    with_fileglob:
+      - named.d*
+      - named.newdns*
+  - name: copy resolv.conf to the servers
+    copy: src=servers-resolv.conf dest=/etc/resolv.conf owner=root group=root mode=0644
+  - name: set /etc/named permissions
+    file: path=/etc/named owner=root group=named mode=0670
+  - name: ensure named is running and enabled
+    service: name=named state=restarted enabled=yes
+
+- hosts: ns02
+  become: yes
+  tasks:
+  - name: copy local_named.te
+    copy: src=local_named.te dest=/tmp/local_named.te mode=0644
+  - name: enable policy
+    shell: |
+        cd /tmp \
+        && checkmodule -M -m -o local_named.mod local_named.te \
+        && semodule_package -o local_named.pp -m local_named.mod \
+        && semodule -i local_named.pp
+  - name: copy named.conf
+    copy: src=slave-named.conf dest=/etc/named.conf owner=root group=named mode=0640
+  - name: copy resolv.conf to the servers
+    copy: src=servers-resolv.conf dest=/etc/resolv.conf owner=root group=root mode=0644
+  - name: set /etc/named permissions
+    file: path=/etc/named owner=root group=named mode=0670
+  - name: ensure named is running and enabled
+    service: name=named state=restarted enabled=yes
+
+- hosts: client,client2
+  become: yes
+  tasks:
+  - name: copy resolv.conf to the client
+    copy: src=client-resolv.conf dest=/etc/resolv.conf owner=root group=root mode=0644
+  - name: copy rndc conf file
+    copy: src=rndc.conf dest=/home/vagrant/rndc.conf owner=vagrant group=vagrant mode=0644
