@@ -1,0 +1,10 @@
+#!/bin/bash
+HOST={{ INET_ROUTER_HOST }}
+USER=vagrant
+shift
+for ARG in {{ FIRST_PORT }} {{ SECOND_PORT }} {{ THIRD_PORT }}
+do
+    nmap -Pn --host_timeout 100 --max-retries 0 -p $ARG $HOST
+done
+
+ssh $USER@$HOST

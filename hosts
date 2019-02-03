@@ -1,0 +1,8 @@
+[centralServer]
+10.10.0.2
+[inetRouter]
+192.168.0.1
+[inetRouter2]
+10.10.0.1
+[centralRouter]
+192.168.0.2

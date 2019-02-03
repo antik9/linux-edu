@@ -1,0 +1,5 @@
+---
+- hosts: centralServer
+  become: true
+  roles:
+    - nginx

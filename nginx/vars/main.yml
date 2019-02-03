@@ -1,0 +1,4 @@
+---
+  hostname: centralServer
+  nginx_port: 80
+  root_path: /usr/share/nginx/html

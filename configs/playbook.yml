@@ -1,0 +1,45 @@
+- hosts: inetRouter
+  become: yes
+  tasks:
+      - name: copy public key
+        copy: src=id_rsa.pub dest=/tmp/id_rsa.pub
+      - name: copy iptables.rules
+        template: src=iptables.rules.j2 dest=/etc/iptables.rules
+      - name: add public key
+        shell: cat /tmp/id_rsa.pub >> ~vagrant/.ssh/authorized_keys && rm /tmp/id_rsa.pub
+      - name: add route for central server through central router
+        shell: echo "192.168.0.0/16 via 192.168.255.2" >> /etc/sysconfig/network-scripts/route-eth1
+      - name: restart network
+        systemd: name=network state=restarted
+      - name: restore iptables
+        shell: iptables-restore /etc/iptables.rules
+      - name: add ip forwarding
+        shell: echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf && sysctl -p
+
+- hosts: centralRouter
+  become: yes
+  tasks:
+      - name: install nmap
+        yum: name=nmap state=latest
+      - name: copy private key
+        copy: src=id_rsa dest=~vagrant/.ssh/id_rsa
+      - name: copy login_knock.sh
+        template: src=knock_login.sh.j2 dest=~vagrant/knock_login.sh mode=755
+      - name: disable eth0
+        shell: echo "DEFROUTE=no" >> /etc/sysconfig/network-scripts/ifcfg-eth0
+      - name: add gateway
+        shell: echo "GATEWAY=192.168.255.1" >> /etc/sysconfig/network-scripts/ifcfg-eth1
+      - name: restart network
+        systemd: name=network state=restarted
+      - name: add ip forwarding
+        shell: echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf && sysctl -p
+
+- hosts: inetRouter2
+  become: yes
+  tasks:
+      - name: copy iptables.rules
+        template: src=iptables-router2.rules dest=/etc/iptables.rules
+      - name: restore iptables
+        shell: iptables-restore /etc/iptables.rules
+      - name: add ip forwarding
+        shell: echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf && sysctl -p
