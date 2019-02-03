@@ -1,0 +1,59 @@
+---
+  - name: Install epel-release
+    yum:
+      name: epel-release
+      state: latest
+    tags:
+      - installation
+
+  - name: Install Nginx
+    yum:
+      pkg: nginx
+      state: latest
+    register: nginxinstalled
+    tags:
+      - installation
+      - configuration
+    notify:
+      - nginx start
+
+  - name: Enable Systemd for NGINX
+    when: nginxinstalled is success
+    tags:
+      - configuration
+    systemd:
+      name: nginx
+      enabled: True
+
+  - name: Add NGINX config
+    when: nginxinstalled is success
+    tags:
+      - configuration
+    template:
+      src: nginx.conf
+      dest: /etc/nginx/nginx.conf
+      owner: nginx
+      group: nginx
+
+  - name: Change access to Web Directory
+    when: nginxinstalled is success
+    tags:
+      - configuration
+    file:
+      path: "{{ ROOT_PATH }}"
+      mode: 0775
+      state: directory
+      owner: nginx
+      group: nginx
+    notify:
+      - nginx restart
+
+  - name: Copy NGINX index.html
+    when: nginxinstalled is success
+    tags:
+      - configuration
+    copy:
+      src: index.html
+      dest: /usr/share/nginx/html
+      owner: nginx
+      group: nginx

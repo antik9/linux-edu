@@ -1,0 +1,6 @@
+---
+  HOSTNAME: nginx
+  NGINX_PORT: 80
+  ROOT_PATH: /usr/share/nginx/html
+  ACCESS_PASS: jMsgll2Fbx0bAtZH55KMzvE1tXRUn6S5
+  FORWARD_PORT: 8080
