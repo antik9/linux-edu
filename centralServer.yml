@@ -2,4 +2,11 @@
 - hosts: centralServer
   become: true
   roles:
-    - nginx
+      - nginx
+  tasks:
+      - name: Disable eth0
+        shell: echo "DEFROUTE=no" >> /etc/sysconfig/network-scripts/ifcfg-eth0
+      - name: Add gateway
+        shell: echo "GATEWAY=192.168.0.1" >> /etc/sysconfig/network-scripts/ifcfg-eth1
+      - name: Restart network service
+        systemd: name=network state=restarted

@@ -102,11 +102,6 @@ Vagrant.configure("2") do |config|
                     ansible.verbose = '-vv'
                     ansible.playbook = "#{boxname.to_s}.yml"
                 end
-                box.vm.provision "shell", run: "always", inline: <<-SHELL
-                    echo "DEFROUTE=no" >> /etc/sysconfig/network-scripts/ifcfg-eth0
-                    echo "GATEWAY=192.168.0.1" >> /etc/sysconfig/network-scripts/ifcfg-eth1
-                    systemctl restart network
-                SHELL
             else
                 box.vm.provision "ansible" do |ansible|
                     ansible.verbose = '-vv'
