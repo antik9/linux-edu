@@ -11,8 +11,27 @@
       - policycoreutils-python
       - tcpdump
 
-  - name: copy transferkey to all servers and the client
-    copy: src=named.zonetransfer.key dest=/etc/named.zonetransfer.key owner=root group=named mode=0644
+- hosts: ns01, ns02, client
+  become: yes
+  tasks:
+  - name: copy first transferkey to all servers and the client
+    copy:
+        src: zonetransfer.key
+        dest: /etc/named.zonetransfer.key
+        owner: root
+        group: named
+        mode: 0644
+
+- hosts: ns01, ns02, client2
+  become: yes
+  tasks:
+  - name: copy second transferkey to all servers and the client
+    copy:
+        src: zonetransfer-client2.key
+        dest: /etc/named.zonetransfer-client2.key
+        owner: root
+        group: named
+        mode: 0644
 
 - hosts: ns01
   become: yes

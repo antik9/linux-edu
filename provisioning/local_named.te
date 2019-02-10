@@ -5,9 +5,11 @@ require {
 	type etc_t;
 	type named_t;
 	class file { create rename unlink write };
+	class file setattr;
 }
 
 #============= named_t ==============
 
 #!!!! WARNING: 'etc_t' is a base type.
 allow named_t etc_t:file { create rename unlink write };
+allow named_t etc_t:file setattr;
