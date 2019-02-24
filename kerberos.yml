@@ -1,0 +1,5 @@
+---
+- hosts: kerberos
+  become: true
+  roles:
+      - kerberos

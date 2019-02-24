@@ -1,0 +1,15 @@
+---
+  - name: register selinux module
+    shell: semodule -i /tmp/nfs_local.pp
+
+  - name: start autofs
+    systemd:
+        service: autofs
+        state: started
+        enabled: yes
+
+  - name: start nfs-secure
+    systemd:
+        service: nfs-secure
+        state: started
+        enabled: yes

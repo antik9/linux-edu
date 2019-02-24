@@ -1,0 +1,15 @@
+---
+  - name: reload nfs
+    systemd:
+        service: nfs
+        state: restarted
+
+  - name: sshd restart
+    systemd:
+        service: sshd
+        state: restarted
+
+  - name: copy krb5.keytab
+    shell: |
+        scp -o StrictHostKeyChecking=no /etc/krb5.keytab root@{{ NFS_CLIENT_IP }}:/etc/krb5.keytab
+        ssh root@{{ NFS_CLIENT_IP }} systemctl restart nfs-secure

@@ -1,0 +1,33 @@
+---
+  - name: Install packages
+    yum:
+        name: ['autofs', 'policycoreutils-python', 'krb5-workstation', 'nfs-utils']
+        state: latest
+    register: installation
+
+  - name: Copy module for enable GSSAPI communication
+    copy:
+        src: nfs_local.pp
+        dest: /tmp/nfs_local.pp
+    register: copy_selinux_module
+    notify: register selinux module
+
+  - name: Copy configs to /etc
+    when: installation is success
+    template:
+        src: "{{ item }}.j2"
+        dest: "/etc/{{ item }}"
+        mode: 0644
+    with_items:
+        - auto.master
+        - auto.nfs
+        - auto.kerberos
+        - krb5.conf
+        - hosts
+    register: copy_config
+
+  - name: append public key to autorized_keys
+    shell: echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQD/0JGvEGRzcy8+71UgcYltcKw1bsI5Yfs73PBYaYBj0FcVCtwoSLomx2IRIkNL8g9u/9g2kGb1FpgrEw3ztNLAlAn5t3ou/UN0x1eAwJgb2+XwgVLTyfZA0NoubpGRGXKIdbKcmS9N0PhF1sLq6HtK3x2fqq3B/qVu6M6fE5hLAd0y8cn1nhCJsCMeEiQMAjjOe1ZWRaonPWoidRlKeWSTd2O58MjhUDquv/5XTBMPBTINPAu6dqfhDFzIpPWVpRmZkwB576nqGcxD8njx+XXspNvuEfIeWOjlE9krIO78nW5RqmJb9YqyqJg/jBlXhih5Oeaem8kgJK1X4ulrrFJX root@kbserver.example.com" >> ~root/.ssh/authorized_keys
+    notify:
+        - start autofs
+        - start nfs-secure

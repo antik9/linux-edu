@@ -1,0 +1,116 @@
+---
+  - name: Install packages
+    yum:
+        name: ['krb5-workstation', 'krb5-server', 'pam_krb5', 'nfs-utils']
+        state: latest
+    register: installation
+
+  - name: Copy configs to /etc
+    when: installation is success
+    template:
+        src: "{{ item }}.j2"
+        dest: "/etc/{{ item }}"
+        mode: 0644
+    with_items:
+        - krb5.conf
+        - exports
+        - hosts
+    register: copy_config
+
+  - name: Copy ssh config
+    copy:
+        src: "{{ item }}"
+        dest: /etc/ssh/
+        mode: 0644
+    with_items:
+        - ssh_config
+        - sshd_config
+    register: ssh_configured
+
+  - name: Copy id_rsa to pass information to client
+    copy:
+        src: id_rsa
+        dest: ~root/.ssh/id_rsa
+        mode: 0600
+    register: autorize_rsa
+
+  - name: copy kerberos config for firewalld
+    copy:
+        src: "{{ item }}"
+        dest: "/usr/lib/firewalld/services/{{ item }}"
+        mode: 0644
+    with_items:
+        - kerberos.xml
+    register: copy_kerberos_xml
+
+  - name: Copy kerberos realm configuration
+    when: installation is success
+    copy:
+        src: "{{ item }}"
+        dest: "/var/kerberos/krb5kdc/{{ item }}"
+        mode: 0644
+    with_items:
+        - kadm5.acl
+        - kdc.conf
+    register: realm_configured
+
+  - name: Create nfs directory
+    when: copy_config is success and copy_kerberos_xml is success
+    file:
+        path: /opt/nfs_share
+        state: directory
+        mode: 0755
+    register: create_nfs_directory
+
+  - name: Create common directory
+    when: create_nfs_directory is success
+    file:
+        path: /opt/nfs_share/public
+        state: directory
+        mode: 0777
+    register: create_common_directory
+
+  - name: register user and host in kerberos
+    when: realm_configured is success
+    shell: |
+        [ -e /var/kerberos/.configured ] || (
+            < /dev/urandom tr -cd 'a-zA-Z0-9' | head -c 16 \
+                | awk '{print $1} {print $1} {print $1}' > /tmp/.pass
+            cat /tmp/.pass | kdb5_util create -s -r NFS_SERVER
+            echo -e 'addprinc vagrant\n{{ VAGRANT_PASS }}\n{{ VAGRANT_PASS }}' | kadmin.local
+            echo -e 'addprinc -randkey nfs/{{ KERBEROS_HOST }}' | kadmin.local
+            echo 'ktadd nfs/{{ KERBEROS_HOST }}' | kadmin.local
+            rm /tmp/.pass
+            touch /var/kerberos/.configured)
+    register: kerberos_initialized
+
+  - name: Start firewalld and nfs
+    when: kerberos_initialized is success
+    systemd:
+        name: "{{ item }}"
+        enabled: yes
+        state: started
+    with_items:
+        - firewalld
+        - nfs
+        - krb5kdc
+        - kadmin
+    register: start_services
+
+  - name: Enable services by firewalld
+    when: start_services is success
+    firewalld:
+        service: "{{ item }}"
+        immediate: yes
+        permanent: yes
+        state: enabled
+    with_items:
+        - nfs
+        - mountd
+        - rpc-bind
+        - kerberos
+    register: open_firewall
+    notify:
+        - reload nfs
+        - copy krb5.keytab
+        - sshd restart

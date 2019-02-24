@@ -1,0 +1,50 @@
+---
+  - name: Copy configs to /etc
+    template:
+        src: "{{ item }}.j2"
+        dest: "/etc/{{ item }}"
+        mode: 0644
+    with_items:
+        - exports
+    register: copy_config
+
+  - name: Create nfs directory
+    when: copy_config is success
+    file:
+        path: /opt/nfs_share
+        state: directory
+        mode: 0755
+    register: create_nfs_directory
+
+  - name: Create common directory
+    when: create_nfs_directory is success
+    file:
+        path: /opt/nfs_share/public
+        state: directory
+        mode: 0777
+    register: create_common_directory
+
+  - name: Start firewalld and nfs
+    when: create_common_directory is success
+    systemd:
+        name: "{{ item }}"
+        enabled: yes
+        state: started
+    with_items:
+        - firewalld
+        - nfs
+    register: start_services
+
+  - name: Enable services by firewalld
+    when: start_services is success
+    firewalld:
+        service: "{{ item }}"
+        immediate: yes
+        permanent: yes
+        state: enabled
+    with_items:
+        - nfs3
+        - mountd
+        - rpc-bind
+    register: open_firewall
+    notify: reload nfs
