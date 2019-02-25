@@ -1,0 +1,44 @@
+---
+- hosts: master,slave
+  become: true
+  tasks:
+  - name: install percona release list
+    yum: name="https://repo.percona.com/yum/percona-release-latest.noarch.rpm" state=latest
+  - name: install Percona server
+    yum: name=Percona-Server-server-57 state=latest
+  - name: copy configs for mysql servers
+    copy: src="{{ HOST }}/{{ item }}.cnf" dest=/etc/my.cnf.d/
+    with_items:
+        - 01-basics
+        - 02-binlog
+  - name: copy db dump
+    copy: src=bet.sql dest=/tmp/
+  - name: copy start script
+    template: src="{{ HOST }}/script.sql.j2" dest=/var/lib/mysql/.script.sql
+  - name: start mysql
+    systemd: service=mysql enabled=yes state=restarted
+  - name: save root password for mysql
+    shell: |
+        cat /var/log/mysqld.log | grep 'root@localhost:' | awk '{print $11}' > /var/lib/mysql/.pass
+
+- hosts: master
+  become: true
+  tasks:
+  - name: create database, load dump to it and dump from it with needed tables
+    shell: |
+        export MYSQL_PASS=$(cat /var/lib/mysql/.pass)
+        cat /var/lib/mysql/.script.sql | mysql -uroot -p$MYSQL_PASS --connect-expired-password
+        rm /var/lib/mysql/.script.sql
+        mysql -uroot -p'{{ MASTER_PASS }}' -D bet < /tmp/bet.sql
+        mysqldump --all-databases --triggers --routines --master-data \
+            --ignore-table=bet.events_on_demand --ignore-table=bet.v_same_event \
+            -uroot -p'{{ MASTER_PASS }}' > /tmp/master.sql
+
+- hosts: slave
+  become: true
+  tasks:
+  - name: load master dump and start slave
+    shell: |
+        scp -o StrictHostKeyChecking=no root@{{ MASTER_IP }}:/tmp/master.sql /tmp/master.sql
+        export MYSQL_PASS=$(cat /var/lib/mysql/.pass)
+        cat /var/lib/mysql/.script.sql | mysql -uroot -p$MYSQL_PASS --connect-expired-password

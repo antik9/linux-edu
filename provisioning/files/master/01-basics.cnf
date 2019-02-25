@@ -1,0 +1,4 @@
+[mysqld]
+server-id=1
+enforce_gtid_consistency=ON
+gtid_mode=ON
