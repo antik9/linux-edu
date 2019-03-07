@@ -1,0 +1,15 @@
+Return-Path: <root@localhost>
+Delivered-To: vagrant@example.com
+Received: from mail.example.com
+	by master with LMTP id +LJ4BPduf1x1ZQAAi4RuvQ
+	for <vagrant@example.com>; Wed, 06 Mar 2019 06:55:51 +0000
+Received: from root (gateway [10.0.2.2])
+	by mail.example.com (Postfix) with SMTP id 0F7BD79463
+	for <vagrant@example.com>; Wed,  6 Mar 2019 06:55:51 +0000 (UTC)
+Subject: Sixth Letter
+from: root <root@localhost> 
+to: vagrant <vagrant@example.com>
+date: 2019-03-07 23:47:15
+ 
+
+Send letter from host
