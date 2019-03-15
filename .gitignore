@@ -1,0 +1,7 @@
+.vagrant
+*.retry
+*.swp
+*.swn
+*.swm
+typescript
+*cookie*

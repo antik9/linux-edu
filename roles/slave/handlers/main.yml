@@ -1,0 +1,3 @@
+---
+- name: start db
+  shell: sudo -u postgres /usr/pgsql-10/bin/pg_ctl -D {{ DB_DIR }} start

@@ -1,0 +1,60 @@
+---
+- name: Add postgres repo
+  shell: rpm -Uvh https://yum.postgresql.org/10/redhat/rhel-7-x86_64/pgdg-centos10-10-2.noarch.rpm
+  register: repo_enabled
+  ignore_errors: yes
+
+- name: Install postgres
+  yum:
+      name: ['postgresql10', 'epel-release',]
+      state: latest
+  register: postgres_installed
+
+- name: Install barman
+  when: postgres_installed is success
+  yum:
+      name: ['barman',]
+      state: latest
+  register: barman_installed
+
+- name: Create .ssh folder for barman user
+  file:
+      path: /var/lib/barman/.ssh
+      state: directory
+      mode: 0700
+      owner: barman
+      group: barman
+  register: make_ssh_dir
+
+- name: Move id_rsa key to .ssh folder
+  when: make_ssh_dir is success
+  copy:
+      src: id_rsa
+      dest: /var/lib/barman/.ssh/id_rsa
+      mode: 0600
+      owner: barman
+      group: barman
+  register: move id_rsa
+
+- name: Move slave config to barman.d
+  when: barman_installed is success
+  template:
+      src: slave.conf.j2
+      dest: "/etc/barman.d/{{ SLAVE_HOST }}.conf"
+      mode: 0644
+  register: slave_conf_done
+
+- name: Add slot for backup
+  when: slave_conf_done is success
+  shell: |
+      export PATH=$PATH:/usr/pgsql-10/bin
+      export PGPASSWORD={{ BACKUP_PASS }}
+      sed -i '/conninfo/s/{{ SLAVE_IP }}/{{ MASTER_IP }}/' /etc/barman.d/{{ SLAVE_HOST }}.conf
+      echo barman receive-wal --create-slot {{ SLAVE_HOST }}
+      barman cron
+      barman switch-wal --force --archive {{ SLAVE_HOST }}
+      ps aux | grep barman | grep receive | grep -v grep | tr -s ' ' | cut -d' ' -f2 | xargs kill
+      sed -i '/conninfo/s/{{ MASTER_IP }}/{{ SLAVE_IP }}/' /etc/barman.d/{{ SLAVE_HOST }}.conf
+      barman receive-wal --create-slot {{ SLAVE_HOST }}
+      barman cron
+  register: barman_configured

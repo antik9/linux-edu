@@ -1,0 +1,30 @@
+---
+- name: Init postgres database
+  shell: |
+      export PG_DIR=/usr/pgsql-10/bin
+      sudo -u postgres $PG_DIR/initdb -D {{ DB_DIR }}
+      sudo -u postgres mkdir {{ DB_DIR }}/pg_log
+      sudo -u postgres chmod 0700 {{ DB_DIR }}/pg_log
+      sudo -u postgres $PG_DIR/pg_ctl -D {{ DB_DIR }} start
+      $PG_DIR/psql -Upostgres -c \
+        "CREATE USER {{ REPLICA_USER }} WITH REPLICATION ENCRYPTED PASSWORD '{{ REPLICA_PASS }}'"
+      $PG_DIR/psql -Upostgres -c \
+        "CREATE USER {{ BACKUP_USER }} WITH REPLICATION LOGIN SUPERUSER ENCRYPTED PASSWORD '{{ BACKUP_PASS }}'"
+      $PG_DIR/createdb -Upostgres {{ DATABASE }}
+      $PG_DIR/psql -Upostgres -d{{ DATABASE }} -c "create table testtable (id serial, data text)"
+      $PG_DIR/psql -Upostgres -c "SELECT pg_create_physical_replication_slot('{{ SLOT_NAME }}')"
+  register: db_started
+
+- name: Move config files
+  when: db_started is success
+  template:
+      src: "{{ item }}.j2"
+      dest: "{{ DB_DIR }}/{{ item }}"
+      mode: 0600
+      owner: postgres
+      group: postgres
+  with_items:
+      - pg_hba.conf
+      - postgresql.conf
+  register: move_configs
+  notify: restart db

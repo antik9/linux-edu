@@ -1,0 +1,40 @@
+---
+- name: Backup master
+  shell: |
+      export PG_DIR=/usr/pgsql-10/bin
+      export PGPASSWORD={{ REPLICA_PASS }}
+      $PG_DIR/pg_basebackup -h {{ MASTER_IP }} -U {{ REPLICA_USER }} -D {{ DB_DIR }} -X s
+      chown -R postgres:postgres {{ DB_DIR }}
+  register: db_backuped
+
+- name: Move config files
+  when: db_backuped is success
+  template:
+      src: "{{ item }}.j2"
+      dest: "{{ DB_DIR }}/{{ item }}"
+      mode: 0600
+      owner: postgres
+      group: postgres
+  with_items:
+      - recovery.conf
+  register: move_configs
+  notify: start db
+
+- name: Create .ssh folder for postgres user
+  file:
+      path: /var/lib/pgsql/.ssh
+      state: directory
+      mode: 0700
+      owner: postgres
+      group: postgres
+  register: make_ssh_dir
+
+- name: Move authorized keys
+  when: make_ssh_dir is success
+  template:
+      src: authorized_keys.j2
+      dest: /var/lib/pgsql/.ssh/authorized_keys
+      mode: 0600
+      owner: postgres
+      group: postgres
+  register: move_authorized_keys

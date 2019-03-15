@@ -1,0 +1,16 @@
+[{{ SLAVE_HOST }}]
+; Description
+description =  "PostgreSQL01 PostgreSQL Database"
+
+; Connection
+conninfo = host={{ SLAVE_IP }} user={{ BACKUP_USER }} dbname={{ DATABASE }}
+
+; Archiver
+backup_method = rsync
+backup_options = concurrent_backup
+streaming_archiver = on
+archiver = on
+slot_name = barman
+retention_policy = RECOVERY WINDOW OF 7 DAYS
+minimum_redundancy = 5
+ssh_command = ssh postgres@{{ SLAVE_IP }}
