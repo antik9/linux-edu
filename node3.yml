@@ -1,0 +1,6 @@
+---
+- hosts: node3
+  become: true
+  roles:
+    - postgres
+    - patroni

@@ -1,0 +1,23 @@
+---
+- name: Add postgres repo
+  shell: rpm -Uvh https://yum.postgresql.org/10/redhat/rhel-7-x86_64/pgdg-centos10-10-2.noarch.rpm
+  register: repo_enabled
+  ignore_errors: yes
+
+- name: Install postgres
+  yum:
+      name: ['postgresql10-server', 'postgresql10', 'epel-release']
+      state: latest
+  register: postgres_installed
+
+- name: Make database directory
+  when: postgres_installed is success
+  file:
+      path: "{{ item }}"
+      state: directory
+      mode: 0700
+      owner: postgres
+      group: postgres
+  with_items:
+      - "{{ DB_DIR }}"
+  register: make_db_dir

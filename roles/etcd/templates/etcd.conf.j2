@@ -1,0 +1,4 @@
+ETCD_DATA_DIR="/var/lib/etcd/default.etcd"
+ETCD_LISTEN_CLIENT_URLS="http://localhost:{{ ETCD_PORT }},http://{{ ETCD_IP }}:{{ ETCD_PORT }}"
+ETCD_NAME="default"
+ETCD_ADVERTISE_CLIENT_URLS="http://{{ ETCD_IP }}:{{ ETCD_PORT }}"

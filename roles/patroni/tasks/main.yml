@@ -1,0 +1,36 @@
+---
+- name: Install supplementary packages
+  yum:
+      name: ['gcc', 'python2-pip', 'python-devel']
+      state: latest
+  register: packages_installed
+
+- name: Upgrade pip and setuptools
+  when: packages_installed is success
+  pip:
+      name: ['pip', 'setuptools']
+      extra_args: --upgrade
+  register: pip_upgraded
+
+- name: Install patroni
+  when: pip_upgraded is success
+  pip:
+      name: ['patroni', 'python-etcd', 'psycopg2-binary']
+  register: patroni_installed
+
+- name: Copy config
+  when: patroni_installed is success
+  template:
+      src: patroni.yml.j2
+      dest: /etc/patroni.yml
+      mode: 0644
+  register: copy_config
+
+- name: Copy unit file
+  when: patroni_installed is success
+  copy:
+      src: patroni.service
+      dest: /etc/systemd/system/patroni.service
+      mode: 0644
+  register: copy_config
+  notify: start patroni

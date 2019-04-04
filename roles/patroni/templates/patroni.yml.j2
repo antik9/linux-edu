@@ -1,0 +1,58 @@
+scope: {{ SCOPE }}
+name: {{ CURRENT_NODE_HOST }}
+
+restapi:
+  listen: {{ CURRENT_NODE_IP }}:8008
+  connect_address: {{ CURRENT_NODE_IP }}:8008
+
+etcd:
+  host: {{ ETCD_IP }}:{{ ETCD_PORT }}
+
+bootstrap:
+  dcs:
+    ttl: 30
+    loop_wait: 10
+    retry_timeout: 10
+    maximum_lag_on_failover: 1048576
+    postgresql:
+      use_pg_rewind: true
+
+  initdb:
+  - encoding: UTF8
+  - data-checksums
+ 
+  pg_hba:
+  - host replication {{ REPLICA_USER }} 127.0.0.1/32 md5
+  - host replication {{ REPLICA_USER }} {{ NODE_1_IP }}/0 md5
+  - host replication {{ REPLICA_USER }} {{ NODE_2_IP }}/0 md5
+  - host replication {{ REPLICA_USER }} {{ NODE_3_IP }}/0 md5
+  - host all all 0.0.0.0/0 md5
+
+  users:
+    {{ ADMIN_USER }}:
+      password: {{ ADMIN_PASS }}
+      options:
+        - createrole
+        - createdb
+
+postgresql:
+  listen: {{ CURRENT_NODE_IP }}:5432
+  bin_dir: /usr/pgsql-10/bin
+  connect_address: {{ CURRENT_NODE_IP }}:5432
+  data_dir: {{ DB_DIR }}
+  pgpass: /tmp/pgpass
+  authentication:
+    replication:
+      username: {{ REPLICA_USER }}
+      password: {{ REPLICA_PASS }}
+    superuser:
+      username: postgres
+      password: {{ POSTGRES_PASS }}
+  parameters:
+    unix_socket_directories: '.'
+ 
+tags:
+  nofailover: false
+  noloadbalance: false
+  clonefrom: false
+  nosync: false

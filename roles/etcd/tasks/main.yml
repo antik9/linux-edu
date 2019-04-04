@@ -1,0 +1,15 @@
+---
+- name: Install etcd
+  yum:
+      name: ['etcd']
+      state: latest
+  register: etcd_installed
+
+- name: Copy config
+  when: etcd_installed is success
+  template:
+      src: etcd.conf.j2
+      dest: /etc/etcd/etcd.conf
+      mode: 0644
+  register: copy_config
+  notify: start etcd

@@ -1,0 +1,6 @@
+---
+- name: start patroni
+  systemd:
+      name: patroni
+      enabled: yes
+      state: started

@@ -1,0 +1,32 @@
+---
+- name: Install haproxy
+  yum:
+      name: ['haproxy', 'policycoreutils-python']
+      state: latest
+  register: haproxy_installed
+
+- name: copy hapxroxy selinux module
+  when: haproxy_installed is success
+  copy:
+      src: haproxy_local.te
+      dest: /tmp/
+  register: selinux_module_copied
+
+- name: enable selinux policy
+  when: selinux_module_copied is success
+  shell: |
+      [ -z "`semodule -l | grep haproxy_local`" ] \
+        && cd /tmp \
+        && checkmodule -M -m -o haproxy_local.mod haproxy_local.te \
+        && semodule_package -o haproxy_local.pp -m haproxy_local.mod \
+        && semodule -i haproxy_local.pp
+  register: selinux_module_enabled
+
+- name: copy config
+  when: haproxy_installed is success and selinux_module_enabled is success
+  template:
+      src: haproxy.cfg.j2
+      dest: /etc/haproxy/haproxy.cfg
+      mode: 0644
+  register: config_copied
+  notify: start haproxy
