@@ -94,8 +94,12 @@ Vagrant.configure("2") do |config|
             end
 
             if boxname.to_s == "haproxy"
-                box.vm.network "forwarded_port", guest: 5000, host: 5000, auto_correct: true
-                box.vm.network "forwarded_port", guest: 7000, host: 7000, auto_correct: true
+                box.vm.network "forwarded_port", auto_correct: true,
+                    guest: EXTRA_VARS[:HAPROXY_PORT],
+                    host: EXTRA_VARS[:HAPROXY_PORT]
+                box.vm.network "forwarded_port", auto_correct: true,
+                    guest: EXTRA_VARS[:STATS_PORT],
+                    host: EXTRA_VARS[:STATS_PORT]
             end
 
             box.vm.provider :virtualbox do |vb|
