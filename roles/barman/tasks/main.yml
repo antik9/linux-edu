@@ -50,7 +50,7 @@
       export PATH=$PATH:/usr/pgsql-10/bin
       export PGPASSWORD={{ BACKUP_PASS }}
       sed -i '/conninfo/s/{{ SLAVE_IP }}/{{ MASTER_IP }}/' /etc/barman.d/{{ SLAVE_HOST }}.conf
-      echo barman receive-wal --create-slot {{ SLAVE_HOST }}
+      barman receive-wal --create-slot {{ SLAVE_HOST }}
       barman cron
       barman switch-wal --force --archive {{ SLAVE_HOST }}
       ps aux | grep barman | grep receive | grep -v grep | tr -s ' ' | cut -d' ' -f2 | xargs kill
