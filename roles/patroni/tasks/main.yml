@@ -16,6 +16,8 @@
   when: pip_upgraded is success
   pip:
       name: ['patroni', 'python-etcd', 'psycopg2-binary']
+  environment:
+      PATH: "/usr/local/sbin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin:/usr/pgsql-10/bin"
   register: patroni_installed
 
 - name: Copy config
